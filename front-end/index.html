@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nexy</title>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/script.js"></script></head>
+
+<body>
+
+<div class="container">
+<div class="card">
+
+<h1>NEXY</h1>
+<p>Plataforma de videoconferência com IA</p>
+
+<div class="menu">
+    <a href="/chatpage"><button>Chat com IA</button></a>
+    <button onclick="criarSala()">Criar reunião</button>
+    <a href="/dashboard.html"><button>Abrir Dashboard</button></a>
+    <a href="/entrar.html"><button>Entrar por link</button></a>
+    <a href="/loginpage">Login</a>
+<a href="/registerpage">Cadastrar</a>
+</div>
+
+<div id="areaReuniao"></div>
+
+</div>
+</div>
+
+<script>
+
+function gerarCodigo(){
+    return Math.random().toString(36).substring(2,8)
+}
+
+function criarSala(){
+
+    let codigo = gerarCodigo()
+
+    let baseURL;
+
+if(window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"){
+    baseURL = "https://intradermal-nonextensive-deedra.ngrok-free.dev"
+}else{
+    baseURL = window.location.origin
+}
+
+    let link = baseURL + "/meeting/" + codigo
+
+    document.getElementById("areaReuniao").innerHTML = `
+        <div class="meeting-box">
+            <h3>🚀 Sala criada com sucesso</h3>
+
+            <p>Compartilhe este link:</p>
+
+            <div class="link-area">
+                <input id="linkInput" value="${link}" readonly>
+                <button onclick="copiarLink()">Copiar</button>
+            </div>
+
+            <a href="/meeting/${codigo}">
+                <button class="btn-enter">Entrar na reunião</button>
+            </a>
+        </div>
+    `
+}
+
+function copiarLink(){
+    let input = document.getElementById("linkInput")
+    input.select()
+    document.execCommand("copy")
+    alert("Link copiado!")
+}
+
+</script>
+
+</body>
+</html>

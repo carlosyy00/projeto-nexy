@@ -1,0 +1,41 @@
+<h2>Login</h2>
+<link rel="stylesheet" href="/css/style.css">
+
+<input id="email" placeholder="Email">
+<input id="senha" type="password" placeholder="Senha">
+
+<button onclick="login()">Entrar</button>
+
+<p>Não tem conta? 
+<button onclick="irCadastro()">Cadastre-se</button>
+</p>
+
+<script>
+function irCadastro(){
+    window.location.href = "/registerpage";
+}
+</script>
+<script>
+function login() {
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('senha').value;
+
+    fetch('/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email, senha})
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "ok") {
+            localStorage.setItem("usuario", data.nome);
+            localStorage.setItem("id_usuario", data.id);
+            window.location.href = "/dashboard";
+        } else {
+            alert("Login inválido");
+        }
+    });
+}
+</script>
+
+<script src="/js/script.js"></script>

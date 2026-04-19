@@ -1,0 +1,32 @@
+<h2>Cadastro</h2>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/script.js"></script>
+
+<input id="nome" placeholder="Nome">
+<input id="email" placeholder="Email">
+<input id="senha" type="password" placeholder="Senha">
+
+<button onclick="register()">Cadastrar</button>
+
+<script>
+function register() {
+    const nome = document.getElementById('nome').value;
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('senha').value;
+
+    fetch('/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({nome, email, senha})
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "ok") {
+            alert("Cadastro realizado!");
+            window.location.href = "/loginpage";
+        } else {
+            alert("Erro: " + data.msg);
+        }
+    });
+}
+</script>

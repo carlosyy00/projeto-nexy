@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexy Dashboard</title>
+
+<link rel="stylesheet" href="/css/style.css">
+
+<style>
+body {
+  margin: 0;
+  background: #0f172a;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 25px;
+  background: #020617;
+}
+
+.container {
+  padding: 30px;
+}
+
+.card {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 10px;
+  margin: 5px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <div>🚀 Nexy</div>
+  <div id="user"></div>
+</div>
+
+<div class="container">
+
+  <div class="card">
+    <h2 id="welcome"></h2>
+  </div>
+
+  <div class="card">
+    <h3>Reuniões</h3>
+    <button onclick="criarSala()">Criar reunião</button>
+    <button onclick="entrarSala()">Entrar com código</button>
+
+    <div id="areaReuniao"></div>
+  </div>
+
+  <div class="card">
+    <button onclick="window.location.href='/chatpage'">Chat IA</button>
+  </div>
+
+  <div class="card">
+    <button onclick="logout()">Sair</button>
+  </div>
+
+</div>
+
+<script>
+const usuario = localStorage.getItem("usuario");
+
+if (!usuario) {
+  window.location.href = "/loginpage";
+}
+
+// mostra nome
+document.getElementById("user").innerText = usuario;
+document.getElementById("welcome").innerText = "Bem-vindo, " + usuario;
+
+// 🔥 CRIAR REUNIÃO (AGORA CERTO)
+async function criarSala() {
+
+  const res = await fetch("/criar_reuniao");
+  const data = await res.json();
+
+  document.getElementById("areaReuniao").innerHTML = `
+    <div class="card">
+      <h3>🚀 Sala criada</h3>
+
+      <input type="text" value="${data.link}" id="linkInput" readonly style="width:100%;padding:10px;margin:10px 0;">
+
+      <button onclick="copiarLink()">Copiar link</button>
+      <button onclick="window.location.href='${data.link}'">Entrar</button>
+    </div>
+  `;
+}
+
+// 🔥 ENTRAR
+function entrarSala(){
+  const entrada = prompt("Cole o código ou link:");
+
+  if(!entrada) return;
+
+  if(entrada.includes("http")){
+    window.location.href = entrada;
+  } else {
+    window.location.href = "/meeting/" + entrada;
+  }
+}
+
+// copiar
+function copiarLink(){
+  const input = document.getElementById("linkInput");
+  navigator.clipboard.writeText(input.value);
+  alert("Link copiado!");
+}
+
+// logout
+function logout(){
+  localStorage.clear();
+  window.location.href = "/loginpage";
+}
+</script>

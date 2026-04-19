@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Nexy Reunião</title>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/script.js"></script>
+
+<style>
+body{
+background: linear-gradient(135deg,#0f172a,#020617);
+color:white;
+font-family:Arial;
+text-align:center;
+margin:0;
+}
+
+.videos{
+display:grid;
+grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+gap:10px;
+margin-top:30px;
+padding:10px;
+}
+
+video{
+width:100%;
+border-radius:12px;
+background:black;
+}
+
+.controls{
+margin-top:20px;
+}
+
+.controls button{
+padding:10px 15px;
+margin:5px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:#3b82f6;
+color:white;
+}
+
+.off{
+background:#ef4444 !important;
+}
+
+#chatBox{
+margin-top:20px;
+}
+.videos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+  padding: 10px;
+}
+
+.videos div {
+  position: relative;
+}
+
+.videos span {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  background: rgba(0,0,0,0.6);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+#chatBox{
+  max-width:500px;
+  margin:20px auto;
+}
+
+#messages{
+  height:200px;
+  overflow-y:auto;
+  background:#020617;
+  padding:10px;
+  border-radius:10px;
+}
+.nameTag {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  background: rgba(0,0,0,0.6);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<h1>🚀 Sala Nexy</h1>
+<div id="recStatus" style="
+display:none;
+background:red;
+color:white;
+padding:5px 10px;
+border-radius:8px;
+width:fit-content;
+margin:10px auto;
+font-weight:bold;
+">
+🔴 Gravando reunião...
+
+
+</div>
+<div class="videos">
+    <video id="localVideo" autoplay muted></video>
+</div>
+
+<div class="controls">
+    <button onclick="toggleCamera()">📷</button>
+    <button onclick="toggleMic()">🎤</button>
+    <button onclick="compartilharTela()">🖥️ Tela</button>
+    <button onclick="encerrarReuniao()">❌ Sair</button>
+    <button onclick="iniciarGravacao()">🎥 Gravar</button>
+<button onclick="pararGravacao()">⏹️ Parar</button>
+</div>
+
+<div id="chatBox">
+    <div id="messages"></div>
+
+    <input id="msgInput" placeholder="Digite algo...">
+    <button id="btnEnviar">Enviar</button>
+</div>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script src="/js/meeting.js"></script>
+
+<script>
+// câmera
+function toggleCamera(){
+    const track = window.localStream?.getVideoTracks()[0];
+    if(!track) return;
+
+    track.enabled = !track.enabled;
+}
+
+// microfone
+function toggleMic(){
+    const track = window.localStream?.getAudioTracks()[0];
+    if(!track) return;
+
+    track.enabled = !track.enabled;
+}
+</script>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script src="/js/meeting.js"></script>
+</body>
+</html>

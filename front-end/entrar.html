@@ -1,0 +1,22 @@
+function entrar(){
+    let valor = document.getElementById("link").value.trim();
+
+    if(valor === ""){
+        alert("Cole um link ou código!");
+        return;
+    }
+
+    // 🔥 SE FOR LINK COMPLETO
+    if(valor.includes("/meeting/")){
+        const codigo = valor.split("/meeting/")[1];
+
+        // remove qualquer lixo depois do código
+        const codigoLimpo = codigo.split("/")[0];
+
+        window.location.href = "/meeting/" + codigoLimpo;
+        return;
+    }
+
+    // 🔥 SE FOR SÓ CÓDIGO
+    window.location.href = "/meeting/" + valor;
+}
