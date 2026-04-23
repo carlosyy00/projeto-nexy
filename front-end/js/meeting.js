@@ -24,16 +24,15 @@ async function iniciar() {
 
         document.getElementById("localVideo").srcObject = window.localStream;
 
-        // 🔥 só entra depois de pegar câmera
         socket.emit("join", { room, nome: nomeUsuario });
 
     } catch (erro) {
         alert("Permita câmera e microfone!");
     }
 }
+
 function criarPeer(id) {
 
-    // 🔥 evita duplicar conexão
     if (peers[id]) {
         return peers[id];
     }
@@ -44,31 +43,32 @@ function criarPeer(id) {
         pc.addTrack(track, window.localStream);
     });
 
-pc.ontrack = (event) => {
+    pc.ontrack = (event) => {
 
-    let container = document.getElementById("user_" + id);
+        let container = document.getElementById("user_" + id);
 
-    if (!container) {
+        if (!container) {
 
-        container = document.createElement("div");
-        container.id = "user_" + id;
+            container = document.createElement("div");
+            container.id = "user_" + id;
+            container.classList.add("video-wrapper"); // 🔥 organização
 
-        const video = document.createElement("video");
-        video.id = id;
-        video.autoplay = true;
-        video.playsInline = true;
+            const video = document.createElement("video");
+            video.autoplay = true;
+            video.playsInline = true;
 
-        const nome = document.createElement("span");
-        nome.innerText = "Usuário";
+            const nome = document.createElement("span");
+            nome.classList.add("nome-video");
+            nome.innerText = "Usuário";
 
-        container.appendChild(video);
-        container.appendChild(nome);
+            container.appendChild(video);
+            container.appendChild(nome);
 
-        document.querySelector(".videos").appendChild(container);
-    }
+            document.querySelector(".videos").appendChild(container);
+        }
 
-    container.querySelector("video").srcObject = event.streams[0];
-};
+        container.querySelector("video").srcObject = event.streams[0];
+    };
 
     pc.onicecandidate = (event) => {
         if (event.candidate) {
@@ -76,12 +76,25 @@ pc.ontrack = (event) => {
         }
     };
 
+    // 🔥 REMOVE AUTOMATICAMENTE SE DESCONECTAR
+    pc.onconnectionstatechange = () => {
+        if (
+            pc.connectionState === "disconnected" ||
+            pc.connectionState === "failed" ||
+            pc.connectionState === "closed"
+        ) {
+            removeVideo(id);
+        }
+    };
+
     peers[id] = pc;
     return pc;
 }
+
+/* ================= SOCKET ================= */
+
 socket.on("all_users", async (data) => {
 
-    // 🔥 apenas quem entrou agora recebe essa lista
     for (let id of data.users) {
 
         if (id === socket.id) continue;
@@ -110,6 +123,7 @@ socket.on("offer", async ({ from, offer }) => {
 
     socket.emit("answer", { to: from, answer });
 });
+
 socket.on("answer", async ({ from, answer }) => {
 
     const pc = peers[from];
@@ -117,6 +131,7 @@ socket.on("answer", async ({ from, answer }) => {
 
     await pc.setRemoteDescription(new RTCSessionDescription(answer));
 });
+
 socket.on("ice", async ({ from, candidate }) => {
 
     const pc = peers[from];
@@ -130,13 +145,41 @@ socket.on("ice", async ({ from, candidate }) => {
 });
 
 socket.on("user_joined", (data) => {
-    adicionarSistema(`${data.nome} entrou na reunião`);
-});
 
+    const hora = new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    adicionarSistema(`${data.nome} entrou na reunião às ${hora}`);
+});
 socket.on("chat", (data) => {
-    console.log("MSG RECEBIDA:", data);
     adicionarMsg(data.nome, data.msg);
 });
+
+/* 🔥 CORRIGIDO AQUI */
+socket.on("user-disconnected", (id) => {
+    removeVideo(id);
+});
+
+/* ================= REMOÇÃO CORRETA ================= */
+
+function removeVideo(id){
+
+    const container = document.getElementById("user_" + id);
+
+    if(container){
+        container.remove();
+    }
+
+    if(peers[id]){
+        peers[id].close();
+        delete peers[id];
+    }
+}
+
+/* ================= FUNÇÕES GERAIS ================= */
+
 function encerrarReuniao(){
     Object.values(peers).forEach(pc => pc.close());
     socket.disconnect();
@@ -148,10 +191,13 @@ function adicionarMsg(nome, msg) {
     const box = document.getElementById("messages");
     if (!box) return;
 
+    // 🔥 GARANTE QUE SEMPRE TEM NOME
+    const nomeFinal = nome || "Usuário";
+
     const div = document.createElement("div");
 
-    const isMe = nome === nomeUsuario;
-    const isIA = nome.includes("Nexy");
+    const isMe = nomeFinal === nomeUsuario;
+    const isIA = nomeFinal.includes("Nexy");
 
     div.style.display = "flex";
     div.style.justifyContent = isMe ? "flex-end" : "flex-start";
@@ -164,29 +210,31 @@ function adicionarMsg(nome, msg) {
     bubble.style.borderRadius = "10px";
     bubble.style.fontSize = "14px";
 
-    // 🎨 cores
     if (isIA) {
         bubble.style.background = "#22c55e";
-        bubble.style.color = "white";
     } else if (isMe) {
         bubble.style.background = "#3b82f6";
-        bubble.style.color = "white";
     } else {
         bubble.style.background = "#1e293b";
-        bubble.style.color = "white";
     }
 
-const hora = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    const hora = new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 
-bubble.innerHTML = `
-    <b>${nome}</b> <span style="font-size:10px;opacity:0.6;">${hora}</span><br>
-    ${msg}
-`;
+    bubble.innerHTML = `
+        <b>${nomeFinal}</b> 
+        <span style="font-size:10px;opacity:0.6;">${hora}</span><br>
+        ${msg}
+    `;
+
     div.appendChild(bubble);
     box.appendChild(div);
 
     box.scrollTop = box.scrollHeight;
 }
+
 async function enviarMsg() {
     
     const input = document.getElementById("msgInput");
@@ -196,7 +244,6 @@ async function enviarMsg() {
 
     adicionarMsg(nomeUsuario, msg);
 
-    // 🔥 IA ativada com @nexy
     if (msg.startsWith("@nexy")) {
 
         const pergunta = msg.replace("@nexy", "").trim();
@@ -227,6 +274,47 @@ async function enviarMsg() {
     input.value = "";
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+
+    const btn = document.getElementById("btnEnviar");
+    const input = document.getElementById("msgInput");
+
+    if (btn) {
+        btn.addEventListener("click", enviarMsg);
+    }
+
+    // 🔥 enviar com ENTER também
+    if (input) {
+        input.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                enviarMsg();
+            }
+        });
+    }
+
+});
+
+function adicionarSistema(msg){
+
+    const box = document.getElementById("messages");
+    if (!box) return;
+
+    const div = document.createElement("div");
+
+    div.style.textAlign = "center";
+    div.style.fontSize = "12px";
+    div.style.opacity = "0.7";
+    div.style.margin = "5px";
+
+    div.innerText = msg;
+
+    box.appendChild(div);
+
+    box.scrollTop = box.scrollHeight;
+}
+
+/* ================= COMPARTILHAR TELA ================= */
+
 async function compartilharTela() {
     try {
         const screenStream = await navigator.mediaDevices.getDisplayMedia({
@@ -235,7 +323,10 @@ async function compartilharTela() {
 
         const screenTrack = screenStream.getVideoTracks()[0];
 
-        // troca em TODOS os peers
+        // 🔥 ATUALIZA STREAM GLOBAL
+        window.localStream = screenStream;
+
+        // troca vídeo em todos os peers
         Object.values(peers).forEach(pc => {
             const sender = pc.getSenders().find(s => s.track.kind === "video");
             if (sender) {
@@ -245,6 +336,7 @@ async function compartilharTela() {
 
         document.getElementById("localVideo").srcObject = screenStream;
 
+        // 🔥 quando parar de compartilhar
         screenTrack.onended = async () => {
 
             const camStream = await navigator.mediaDevices.getUserMedia({
@@ -254,6 +346,9 @@ async function compartilharTela() {
 
             const camTrack = camStream.getVideoTracks()[0];
 
+            // 🔥 VOLTA PARA CAMERA
+            window.localStream = camStream;
+
             Object.values(peers).forEach(pc => {
                 const sender = pc.getSenders().find(s => s.track.kind === "video");
                 if (sender) {
@@ -262,7 +357,6 @@ async function compartilharTela() {
             });
 
             document.getElementById("localVideo").srcObject = camStream;
-            window.localStream = camStream;
         };
 
     } catch (err) {
@@ -271,8 +365,8 @@ async function compartilharTela() {
     }
 }
 
+/* ================= GRAVAÇÃO ================= */
 
-/*gravar tela*/
 let recorder;
 let gravando = false;
 
@@ -280,7 +374,13 @@ async function iniciarGravacao() {
 
     if (gravando) return;
 
-    const stream = document.getElementById("localVideo").srcObject;
+    // 🔥 USA SEMPRE O STREAM ATUAL
+    const stream = window.localStream;
+
+    if (!stream) {
+        alert("Sem vídeo para gravar");
+        return;
+    }
 
     recorder = new MediaRecorder(stream);
 
@@ -301,52 +401,35 @@ async function iniciarGravacao() {
     recorder.start();
     gravando = true;
 
-    // 🔥 MOSTRAR AVISO
-    document.getElementById("recStatus").style.display = "block";
+    // 🔥 STATUS VISUAL
+    const status = document.getElementById("recStatus");
+    if (status) {
+        status.style.display = "block";
+    }
 }
+
+/* ================= PARAR GRAVAÇÃO ================= */
 
 function pararGravacao(){
 
-    if(recorder){
+    if(recorder && gravando){
         recorder.stop();
         gravando = false;
 
-        // 🔥 MENSAGEM DE ENCERRAMENTO
         const status = document.getElementById("recStatus");
 
-        status.innerText = "✅ Gravação encerrada";
-        status.style.background = "green";
+        if (status) {
+            status.innerText = "✅ Gravação encerrada";
+            status.style.background = "green";
 
-        setTimeout(() => {
-            status.style.display = "none";
-            status.innerText = "🔴 Gravando reunião...";
-            status.style.background = "red";
-        }, 3000);
+            setTimeout(() => {
+                status.style.display = "none";
+                status.innerText = "🔴 Gravando reunião...";
+                status.style.background = "red";
+            }, 3000);
+        }
     }
 }
+/* ================= INIT ================= */
 
-document.addEventListener("DOMContentLoaded", () => {
-
-    const btn = document.getElementById("btnEnviar");
-
-    if (btn) {
-        btn.addEventListener("click", enviarMsg);
-    }
-
-});
-function adicionarSistema(msg){
-
-    const box = document.getElementById("messages");
-
-    const div = document.createElement("div");
-
-    div.style.textAlign = "center";
-    div.style.fontSize = "12px";
-    div.style.opacity = "0.7";
-    div.style.margin = "5px";
-
-    div.innerText = msg;
-
-    box.appendChild(div);
-}
 window.onload = iniciar;

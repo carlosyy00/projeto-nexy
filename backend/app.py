@@ -19,6 +19,7 @@ def get_db():
         database="nexy"
     )
 
+
 # ROTAS
 @app.route("/")
 def home():
@@ -112,8 +113,14 @@ def chat_api():
             "http://localhost:11434/api/generate",
             json={
                 "model": "llama3.2",
-                "prompt": msg,
-                "stream": False
+    "prompt": f"""
+Você é a Nexy, uma assistente de IA dentro de uma reunião.
+Responda sempre em português do Brasil.
+Seja direto, útil e inteligente.
+
+Pergunta do usuário: {msg}
+""",
+    "stream": False
             },
             timeout=60
         )
@@ -131,6 +138,11 @@ def chat_api():
             "resposta": "Erro no servidor de IA",
             "erro": str(e)
         })
+        
+@app.route("/sobre")
+def sobre():
+    return send_from_directory(app.static_folder, "sobre.html")
+        
 # SOCKET MULTIUSUÁRIO
 @socketio.on("join")
 def on_join(data):
@@ -175,3 +187,7 @@ def chat(data):
 
 if __name__ == "__main__":
     socketio.run(app, port=5000, debug=True)
+    
+@socketio.on('disconnect')
+def handle_disconnect():
+    emit('user-disconnected', request.sid, broadcast=True)    
