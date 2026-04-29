@@ -13,6 +13,37 @@ if (precisaLogin && !usuario) {
 }
 
 // CHAT IA
+// 🔥 MENSAGEM AUTOMÁTICA DA IA
+window.addEventListener("load", () => {
+
+    const chat = document.getElementById("chat");
+
+    if (chat) {
+        chat.innerHTML += `
+            <div style="
+                color:#38bdf8;
+                background:#0f172a;
+                padding:10px;
+                border-radius:10px;
+                margin-bottom:10px;
+            ">
+                <b>Nexy:</b><br>
+                Olá 👋 Eu sou a IA da Nexy.
+
+                Posso te ajudar durante a reunião com:
+                • Resumos
+                • Explicações
+                • Dúvidas técnicas
+                • Organização da conversa
+
+                Pode perguntar o que quiser 🙂
+            </div>
+        `;
+    }
+});
+
+
+// 🔥 ENVIO DE MENSAGEM (SEU CÓDIGO MELHORADO)
 async function enviarMensagem() {
 
     const input = document.getElementById("mensagem");
@@ -22,28 +53,14 @@ async function enviarMensagem() {
 
     const chat = document.getElementById("chat");
 
-    chat.innerHTML += `<div><b>${usuario}:</b> ${texto}</div>`;
+    // mensagem do usuário
+    chat.innerHTML += `
+        <div style="text-align:right; margin:5px;">
+            <b>${usuario}:</b> ${texto}
+        </div>
+    `;
+
     input.value = "";
-
-    try {
-        const resposta = await fetch("/chat", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ msg: texto })
-        });
-
-        const dados = await resposta.json();
-
-        chat.innerHTML += `
-            <div style="color:#38bdf8;">
-                <b>Nexy:</b> ${dados.resposta}
-            </div>
-        `;
-
-    } catch {
-        chat.innerHTML += `<div style="color:red;">Erro na IA</div>`;
-    }
-
 
     try {
         const resposta = await fetch("/chat", {
@@ -56,11 +73,22 @@ async function enviarMensagem() {
 
         const dados = await resposta.json();
 
+        // resposta da IA
         chat.innerHTML += `
-            <div style="color:#38bdf8;">
+            <div style="
+                color:#38bdf8;
+                background:#020617;
+                padding:10px;
+                border-radius:10px;
+                margin:5px;
+                text-align:left;
+            ">
                 <b>Nexy:</b> ${dados.resposta}
             </div>
         `;
+
+        // 🔥 scroll automático
+        chat.scrollTop = chat.scrollHeight;
 
     } catch (erro) {
         chat.innerHTML += `
@@ -70,8 +98,7 @@ async function enviarMensagem() {
         `;
         console.error(erro);
     }
-}
-
+}                                                                                           
 // 🔥 GERAR CÓDIGO DA SALA
 function gerarCodigo() {
     return Math.random().toString(36).substring(2, 8);

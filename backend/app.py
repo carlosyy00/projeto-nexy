@@ -160,31 +160,59 @@ def logout():
 def chat_api():
     try:
         data = request.json
-        msg = data.get("msg", "")
+        msg = data.get("msg", "").strip().lower()
 
+        # 🔥 NORMALIZAÇÃO
+        msg = msg.replace("oq", "o que")
+        msg = msg.replace("q ", "que ")
+        msg = msg.replace("vc", "você")
+
+        # 🔥 RESPOSTAS FIXAS (DEMO PERFEITA)
+        respostas_fixas = {
+            "webrtc": "WebRTC é uma tecnologia que permite comunicação em tempo real (áudio, vídeo e dados) diretamente no navegador.",
+            "instagram": "Instagram é uma rede social onde as pessoas compartilham fotos, vídeos e interagem com outros usuários.",
+            "inteligencia artificial": "Inteligência Artificial é a área da computação que permite que máquinas simulem o pensamento humano.",
+            "nexy": "Nexy é uma plataforma de videoconferência com inteligência artificial integrada."
+        }
+
+        for chave in respostas_fixas:
+            if chave in msg:
+                return jsonify({"resposta": respostas_fixas[chave]})
+
+        # 🔥 IA LOCAL
         r = requests.post(
             "http://localhost:11434/api/generate",
             json={
-                "model": "llama3.2",
-                "prompt": f"""
-Você é a Nexy, uma assistente de IA dentro de uma reunião.
-Responda sempre em português do Brasil.
-
-Pergunta: {msg}
-""",
+                "model": "phi",
+                "prompt": f"Explique de forma simples: {msg}",
                 "stream": False
             },
-            timeout=60
+            timeout=30
         )
 
-        return jsonify({
-            "resposta": r.json().get("response", "Sem resposta")
-        })
+        resposta = r.json().get("response", "").strip()
+
+        # 🔥 BLOQUEIA INGLÊS NA RAIZ
+        palavras_ingles = [" is ", " are ", " the ", " and ", "with", "this", "that"]
+
+        if any(p in resposta.lower() for p in palavras_ingles):
+            resposta = "Não consegui responder corretamente em português. Tente reformular a pergunta."
+
+        # 🔥 LIMPA TEXTO RUIM
+        lixo = ["Pergunta", "Resposta", "Assistant", "Hello"]
+
+        for palavra in lixo:
+            resposta = resposta.replace(palavra, "")
+
+        # 🔥 LIMITA TAMANHO
+        if len(resposta) > 200:
+            resposta = resposta[:200] + "..."
+
+        return jsonify({"resposta": resposta})
 
     except Exception as e:
         print("ERRO CHAT:", e)
         return jsonify({"resposta": "Erro no servidor de IA"})
-
 # ───────── SOCKET ─────────
 
 @socketio.on("join")
