@@ -1,0 +1,5 @@
+Flask
+Flask-SocketIO
+requests
+mysql-connector-python
+Werkzeug
