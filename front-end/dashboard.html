@@ -42,6 +42,15 @@ button {
   color: white;
   cursor: pointer;
 }
+
+button:hover {
+  background: #2563eb;
+}
+
+input {
+  border: none;
+  border-radius: 6px;
+}
 </style>
 </head>
 
@@ -60,6 +69,7 @@ button {
 
   <div class="card">
     <h3>Reuniões</h3>
+
     <button onclick="criarSala()">Criar reunião</button>
     <button onclick="entrarSala()">Entrar com código</button>
 
@@ -67,12 +77,35 @@ button {
   </div>
 
   <div class="card">
-    <button onclick="window.location.href='/chatpage'">Chat IA</button>
+    <h3>Área Administrativa</h3>
+
+    <button onclick="window.location.href='/usuarios'">
+      Gerenciar Usuários
+    </button>
+
+    <button onclick="window.location.href='/salas'">
+      Gerenciar Salas
+    </button>
   </div>
 
   <div class="card">
-    <button onclick="logout()">Sair</button>
-    <button onclick="window.location.href='/sobre'">Sobre o Nexy</button>
+    <h3>Inteligência Artificial</h3>
+
+    <button onclick="window.location.href='/chatpage'">
+      Chat IA
+    </button>
+  </div>
+
+  <div class="card">
+    <h3>Sistema</h3>
+
+    <button onclick="window.location.href='/sobre'">
+      Sobre o Nexy
+    </button>
+
+    <button onclick="logout()">
+      Sair
+    </button>
   </div>
 
 </div>
@@ -84,13 +117,10 @@ if (!usuario) {
   window.location.href = "/loginpage";
 }
 
-// mostra nome
 document.getElementById("user").innerText = usuario;
 document.getElementById("welcome").innerText = "Bem-vindo, " + usuario;
 
-// 🔥 CRIAR REUNIÃO (AGORA CERTO)
 async function criarSala() {
-
   const res = await fetch("/criar_reuniao");
   const data = await res.json();
 
@@ -98,7 +128,13 @@ async function criarSala() {
     <div class="card">
       <h3>🚀 Sala criada</h3>
 
-      <input type="text" value="${data.link}" id="linkInput" readonly style="width:100%;padding:10px;margin:10px 0;">
+      <input 
+        type="text" 
+        value="${data.link}" 
+        id="linkInput" 
+        readonly 
+        style="width:100%; padding:10px; margin:10px 0;"
+      >
 
       <button onclick="copiarLink()">Copiar link</button>
       <button onclick="window.location.href='${data.link}'">Entrar</button>
@@ -106,29 +142,32 @@ async function criarSala() {
   `;
 }
 
-// 🔥 ENTRAR
-function entrarSala(){
+function entrarSala() {
   const entrada = prompt("Cole o código ou link:");
 
-  if(!entrada) return;
+  if (!entrada) return;
 
-  if(entrada.includes("http")){
+  if (entrada.includes("http")) {
     window.location.href = entrada;
   } else {
     window.location.href = "/meeting/" + entrada;
   }
 }
 
-// copiar
-function copiarLink(){
+function copiarLink() {
   const input = document.getElementById("linkInput");
+
+  if (!input) return;
+
   navigator.clipboard.writeText(input.value);
   alert("Link copiado!");
 }
 
-// logout
-function logout(){
+function logout() {
   localStorage.clear();
-  window.location.href = "/loginpage";
+  window.location.href = "/logout";
 }
 </script>
+
+</body>
+</html>
