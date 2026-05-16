@@ -1,41 +1,118 @@
-<h2>Login</h2>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Nexy</title>
+
 <link rel="stylesheet" href="/css/style.css">
 
-<input id="email" placeholder="Email">
-<input id="senha" type="password" placeholder="Senha">
-
-<button onclick="login()">Entrar</button>
-
-<p>Não tem conta? 
-<button onclick="irCadastro()">Cadastre-se</button>
-</p>
-
-<script>
-function irCadastro(){
-    window.location.href = "/registerpage";
+<style>
+body {
+  margin: 0;
+  background: #0f172a;
+  color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
-</script>
+
+.card {
+  background: #1e293b;
+  padding: 30px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 380px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #2563eb;
+}
+
+.link-button {
+  background: transparent;
+  color: #38bdf8;
+  padding: 0;
+  margin: 0;
+  width: auto;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>Login</h2>
+
+  <input id="email" placeholder="Email">
+  <input id="senha" type="password" placeholder="Senha">
+
+  <button onclick="login()">Entrar</button>
+
+  <p>
+    Não tem conta?
+    <button class="link-button" onclick="irCadastro()">Cadastre-se</button>
+  </p>
+</div>
+
 <script>
+function irCadastro() {
+  window.location.href = "/registerpage";
+}
+
 function login() {
-    const email = document.getElementById('email').value;
-    const senha = document.getElementById('senha').value;
+  const email = document.getElementById("email").value.trim();
+  const senha = document.getElementById("senha").value.trim();
 
-    fetch('/login', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({email, senha})
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === "ok") {
-            localStorage.setItem("usuario", data.nome);
-            localStorage.setItem("id_usuario", data.id);
-            window.location.href = "/dashboard";
-        } else {
-            alert("Login inválido");
-        }
-    });
+  if (!email || !senha) {
+    alert("Preencha e-mail e senha.");
+    return;
+  }
+
+  fetch("/login", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({email, senha})
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "ok") {
+      localStorage.setItem("usuario", data.nome);
+      localStorage.setItem("id_usuario", data.id);
+      localStorage.setItem("tipo_usuario", data.tipo_usuario || "usuario");
+
+      window.location.href = "/dashboard";
+    } else {
+      alert(data.msg || "Login inválido");
+    }
+  })
+  .catch(() => {
+    alert("Erro ao tentar fazer login.");
+  });
 }
 </script>
 
-<script src="/js/script.js"></script>
+</body>
+</html>

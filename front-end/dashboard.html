@@ -18,6 +18,7 @@ body {
 .topbar {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 15px 25px;
   background: #020617;
 }
@@ -31,6 +32,32 @@ body {
   padding: 20px;
   border-radius: 10px;
   margin-bottom: 20px;
+}
+
+.cards-resumo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.resumo-card {
+  background: #020617;
+  padding: 18px;
+  border-radius: 10px;
+  border: 1px solid #334155;
+}
+
+.resumo-card h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.resumo-card p {
+  font-size: 26px;
+  font-weight: bold;
+  margin: 10px 0 0;
 }
 
 button {
@@ -51,6 +78,13 @@ input {
   border: none;
   border-radius: 6px;
 }
+
+.badge {
+  background: #2563eb;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
 </style>
 </head>
 
@@ -58,13 +92,44 @@ input {
 
 <div class="topbar">
   <div>🚀 Nexy</div>
-  <div id="user"></div>
+  <div>
+    <span id="user"></span>
+    <span class="badge" id="tipoUsuario"></span>
+  </div>
 </div>
 
 <div class="container">
 
   <div class="card">
     <h2 id="welcome"></h2>
+    <p>Gerencie suas reuniões, salas, chat com IA e recursos do sistema.</p>
+  </div>
+
+  <div class="cards-resumo">
+    <div class="resumo-card">
+      <h3>Usuários</h3>
+      <p id="totalUsuarios">0</p>
+    </div>
+
+    <div class="resumo-card">
+      <h3>Salas</h3>
+      <p id="totalSalas">0</p>
+    </div>
+
+    <div class="resumo-card">
+      <h3>Reuniões</h3>
+      <p id="totalReunioes">0</p>
+    </div>
+
+    <div class="resumo-card">
+      <h3>Soma Mensagens</h3>
+      <p id="totalMensagens">0</p>
+    </div>
+
+    <div class="resumo-card">
+      <h3>Média Msg/Reunião</h3>
+      <p id="mediaMensagens">0</p>
+    </div>
   </div>
 
   <div class="card">
@@ -76,7 +141,7 @@ input {
     <div id="areaReuniao"></div>
   </div>
 
-  <div class="card">
+  <div class="card" id="areaAdmin">
     <h3>Área Administrativa</h3>
 
     <button onclick="window.location.href='/usuarios'">
@@ -85,6 +150,10 @@ input {
 
     <button onclick="window.location.href='/salas'">
       Gerenciar Salas
+    </button>
+
+    <button onclick="window.location.href='/relatorio_reunioes'">
+      Relatório de Reuniões
     </button>
   </div>
 
@@ -112,17 +181,45 @@ input {
 
 <script>
 const usuario = localStorage.getItem("usuario");
+const tipoUsuario = localStorage.getItem("tipo_usuario") || "usuario";
 
 if (!usuario) {
   window.location.href = "/loginpage";
 }
 
 document.getElementById("user").innerText = usuario;
+document.getElementById("tipoUsuario").innerText = tipoUsuario;
 document.getElementById("welcome").innerText = "Bem-vindo, " + usuario;
+
+if (tipoUsuario !== "admin") {
+  document.getElementById("areaAdmin").style.display = "none";
+}
+
+async function carregarResumo() {
+  try {
+    const res = await fetch("/dashboard_stats");
+    const data = await res.json();
+
+    if (data.status === "ok") {
+      document.getElementById("totalUsuarios").innerText = data.total_usuarios;
+      document.getElementById("totalSalas").innerText = data.total_salas;
+      document.getElementById("totalReunioes").innerText = data.total_reunioes;
+      document.getElementById("totalMensagens").innerText = data.soma_mensagens;
+      document.getElementById("mediaMensagens").innerText = data.media_mensagens;
+    }
+  } catch (erro) {
+    console.log("Erro ao carregar resumo:", erro);
+  }
+}
 
 async function criarSala() {
   const res = await fetch("/criar_reuniao");
   const data = await res.json();
+
+  if (data.status !== "ok") {
+    alert(data.msg || "Erro ao criar reunião.");
+    return;
+  }
 
   document.getElementById("areaReuniao").innerHTML = `
     <div class="card">
@@ -140,6 +237,8 @@ async function criarSala() {
       <button onclick="window.location.href='${data.link}'">Entrar</button>
     </div>
   `;
+
+  carregarResumo();
 }
 
 function entrarSala() {
@@ -167,6 +266,8 @@ function logout() {
   localStorage.clear();
   window.location.href = "/logout";
 }
+
+carregarResumo();
 </script>
 
 </body>

@@ -1,32 +1,124 @@
-<h2>Cadastro</h2>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadastro - Nexy</title>
+
 <link rel="stylesheet" href="/css/style.css">
-<script src="/js/script.js"></script>
 
-<input id="nome" placeholder="Nome">
-<input id="email" placeholder="Email">
-<input id="senha" type="password" placeholder="Senha">
+<style>
+body {
+  margin: 0;
+  background: #0f172a;
+  color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-<button onclick="register()">Cadastrar</button>
+.card {
+  background: #1e293b;
+  padding: 30px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 380px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #2563eb;
+}
+
+.link-button {
+  background: transparent;
+  color: #38bdf8;
+  padding: 0;
+  margin: 10px 0 0;
+  width: auto;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>Cadastro</h2>
+
+  <input id="nome" placeholder="Nome">
+  <input id="email" placeholder="Email">
+  <input id="senha" type="password" placeholder="Senha">
+
+  <button onclick="register()">Cadastrar</button>
+
+  <button class="link-button" onclick="irLogin()">Já tenho conta</button>
+</div>
 
 <script>
-function register() {
-    const nome = document.getElementById('nome').value;
-    const email = document.getElementById('email').value;
-    const senha = document.getElementById('senha').value;
+function irLogin() {
+  window.location.href = "/loginpage";
+}
 
-    fetch('/register', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({nome, email, senha})
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === "ok") {
-            alert("Cadastro realizado!");
-            window.location.href = "/loginpage";
-        } else {
-            alert("Erro: " + data.msg);
-        }
-    });
+function register() {
+  const nome = document.getElementById("nome").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const senha = document.getElementById("senha").value.trim();
+
+  if (!nome || !email || !senha) {
+    alert("Preencha todos os campos.");
+    return;
+  }
+
+  if (!email.includes("@") || !email.includes(".")) {
+    alert("Digite um e-mail válido.");
+    return;
+  }
+
+  if (senha.length < 6) {
+    alert("A senha deve ter pelo menos 6 caracteres.");
+    return;
+  }
+
+  fetch("/register", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({nome, email, senha})
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "ok") {
+      alert("Cadastro realizado!");
+      window.location.href = "/loginpage";
+    } else {
+      alert("Erro: " + data.msg);
+    }
+  })
+  .catch(() => {
+    alert("Erro ao cadastrar usuário.");
+  });
 }
 </script>
+
+</body>
+</html>
