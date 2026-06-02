@@ -8,6 +8,12 @@ from dotenv import load_dotenv
 import random
 import string
 from html import escape
+import socket
+
+try:
+    from pyngrok import ngrok
+except ImportError:
+    ngrok = None
 
 app = Flask(__name__, static_folder="../front-end", static_url_path="")
 
@@ -20,7 +26,51 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 load_dotenv()
 
 NGROK_URL = os.getenv("NGROK_URL")
+NGROK_AUTHTOKEN = os.getenv("NGROK_AUTHTOKEN")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("8.8.8.8", 80))
+        return s.getsockname()[0]
+    except Exception:
+        return "127.0.0.1"
+    finally:
+        s.close()
+
+
+def get_base_url():
+    if NGROK_URL:
+        return NGROK_URL.rstrip("/")
+
+    base = request.host_url.rstrip("/")
+    if base.startswith("http://127.0.0.1") or base.startswith("http://localhost"):
+        local_ip = get_local_ip()
+        return base.replace("127.0.0.1", local_ip).replace("localhost", local_ip)
+
+    return base
+
+
+def start_ngrok():
+    print(f"[ngrok] start_ngrok called. NGROK_URL set={bool(NGROK_URL)}, NGROK_AUTHTOKEN set={bool(NGROK_AUTHTOKEN)}")
+
+    if not ngrok:
+        print("[ngrok] pyngrok não está instalado. Instale pyngrok no requirements.txt.")
+        return None
+
+    if not NGROK_AUTHTOKEN:
+        print("[ngrok] NGROK_AUTHTOKEN não está configurado.")
+        return None
+
+    try:
+        ngrok.set_auth_token(NGROK_AUTHTOKEN)
+        public_url = ngrok.connect(5000, bind_tls=True).public_url
+        return public_url
+    except Exception as e:
+        print(f"[ngrok] erro ao iniciar ngrok: {e}")
+        return None
 
 
 def get_db():
@@ -93,8 +143,6 @@ def chat_page():
 
 @app.route("/meeting/<room>")
 def meeting(room):
-    if not usuario_logado():
-        return redirect("/loginpage")
     return send_from_directory(app.static_folder, "meeting.html")
 
 
@@ -105,7 +153,7 @@ def sobre():
 
 @app.route("/config")
 def config():
-    base = NGROK_URL if NGROK_URL else request.host_url.rstrip("/")
+    base = get_base_url()
     return jsonify({"base_url": base})
 
 
@@ -310,7 +358,7 @@ def criar_reuniao():
         return jsonify({"status": "erro", "msg": "Usuário não logado"}), 401
 
     codigo = gerar_codigo()
-    base = NGROK_URL if NGROK_URL else request.host_url.rstrip("/")
+    base = get_base_url()
     link = f"{base}/meeting/{codigo}"
 
     nome_sala = f"Sala {codigo}"
@@ -739,7 +787,7 @@ def nova_sala():
             return "Já existe uma sala com esse nome. <br><a href='/salas/nova'>Voltar</a>"
 
         codigo = gerar_codigo()
-        base = NGROK_URL if NGROK_URL else request.host_url.rstrip("/")
+        base = get_base_url()
         link = f"{base}/meeting/{codigo}"
         id_criador = session.get("id_usuario")
 
@@ -1189,4 +1237,10 @@ def handle_disconnect():
 
 
 if __name__ == "__main__":
-    socketio.run(app, port=5000, debug=True)
+    if not NGROK_URL and NGROK_AUTHTOKEN:
+        public_url = start_ngrok()
+        if public_url:
+            NGROK_URL = public_url
+            print(f"[ngrok] public url: {NGROK_URL}")
+
+    socketio.run(app, host="0.0.0.0", port=5000, debug=False, allow_unsafe_werkzeug=True)

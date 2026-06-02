@@ -1,10 +1,18 @@
 const socket = io();
 
 const room = window.location.pathname.split("/")[2];
-const nomeUsuario = localStorage.getItem("usuario");
+let nomeUsuario = localStorage.getItem("usuario");
 
 if (!nomeUsuario) {
-    window.location.href = "/loginpage";
+    nomeUsuario = prompt("Digite seu nome para entrar na reunião:");
+
+    if (!nomeUsuario || !nomeUsuario.trim()) {
+        alert("Nome é necessário para entrar na reunião.");
+        window.location.href = "/";
+    } else {
+        nomeUsuario = nomeUsuario.trim();
+        localStorage.setItem("usuario", nomeUsuario);
+    }
 }
 
 let peers = {};

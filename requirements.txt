@@ -3,3 +3,4 @@ Flask-SocketIO
 requests
 mysql-connector-python
 Werkzeug
+pyngrok

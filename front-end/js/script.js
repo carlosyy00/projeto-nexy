@@ -117,13 +117,13 @@ async function criarSala() {
 
     baseURL = data.base_url;
 
-    // 🔥 força usar ngrok se estiver local
-    if(baseURL.includes("localhost") || baseURL.includes("127.0.0.1")){
-        baseURL = "https://SEU-LINK-NGROK-AQUI";
+    if (baseURL.includes("localhost") || baseURL.includes("127.0.0.1")) {
+        console.warn("Base URL is local. Users outside your network may not be able to access the meeting unless you use a public tunnel (ngrok).");
     }
 
-  } catch {
-    baseURL = "https://SEU-LINK-NGROK-AQUI";
+  } catch (erro) {
+    console.error("Erro ao buscar configuração de base URL:", erro);
+    baseURL = window.location.origin;
   }
 
   const link = baseURL + "/meeting/" + codigo;
