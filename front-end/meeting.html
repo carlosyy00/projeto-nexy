@@ -1,128 +1,608 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nexy Reunião</title>
 <link rel="stylesheet" href="/css/style.css">
 
 <style>
-body{
-background: linear-gradient(135deg,#0f172a,#020617);
-color:white;
-font-family:Arial;
-text-align:center;
-margin:0;
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0b1120;
+  --surface: #16213a;
+  --surface-2: #1c2742;
+  --border: rgba(148,163,184,0.14);
+  --primary: #3b82f6;
+  --danger: #ef4444;
+  --text: #e8eefc;
+  --muted: #94a3b8;
 }
 
-.videos{
-display:grid;
-grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
-gap:15px;
-margin-top:30px;
-padding:10px;
+/* sobrescreve o reset centralizado do style.css externo */
+body {
+  margin: 0;
+  padding: 0;
+  display: block;
+  align-items: initial;
+  background:
+    radial-gradient(circle at 85% -10%, rgba(56,189,248,0.10), transparent 38%),
+    linear-gradient(180deg, #08101f 0%, #0b1120 60%);
+  color: var(--text);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.videos div {
-position: relative;
+.room {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
-video{
-width:100%;
-border-radius:12px;
-background:black;
+/* ===== Topo ===== */
+.room-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 22px;
+  background: rgba(8,14,28,0.7);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(8px);
 }
+
+.room-top .left { display: flex; align-items: center; gap: 12px; }
+
+/* botão Voltar no topo */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.back-btn:hover {
+  border-color: rgba(96,165,250,0.5);
+  background: rgba(59,130,246,0.14);
+  transform: translateY(-1px);
+}
+
+/* aviso de câmera/HTTPS */
+.camera-aviso {
+  display: none;
+  margin: 10px 18px 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.camera-aviso.show { display: block; }
+.camera-aviso.erro {
+  background: rgba(239,68,68,0.14);
+  border: 1px solid rgba(239,68,68,0.4);
+  color: #fca5a5;
+}
+.camera-aviso.aviso {
+  background: rgba(251,191,36,0.14);
+  border: 1px solid rgba(251,191,36,0.4);
+  color: #fcd34d;
+}
+
+.brand-dot {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--primary), #7c3aed);
+  display: grid; place-items: center;
+  font-weight: 800; font-size: 16px;
+  box-shadow: 0 6px 16px rgba(59,130,246,0.4);
+}
+
+.room-top h1 { font-size: 17px; font-weight: 700; }
+.room-top .sub { font-size: 12px; color: var(--muted); }
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rec-badge {
+  display: none;
+  align-items: center;
+  gap: 7px;
+  background: rgba(239,68,68,0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239,68,68,0.4);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* ===== Convite ===== */
+.invite-wrap { position: relative; }
+
+.invite-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.invite-btn:hover {
+  border-color: rgba(96,165,250,0.5);
+  background: rgba(59,130,246,0.14);
+}
+
+.invite-pop {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 340px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 18px 44px rgba(2,6,23,0.6);
+  z-index: 100;
+}
+.invite-pop.open { display: block; }
+
+.invite-pop-title {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.invite-row { display: flex; gap: 8px; }
+
+.invite-row input {
+  flex: 1;
+  width: auto;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.invite-row button {
+  padding: 0 14px;
+  border: none;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--primary), #2563eb);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.invite-row button:hover { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+
+/* opções de compartilhamento (WhatsApp, e-mail...) */
+.invite-share {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.share-btn:hover { transform: translateY(-1px); border-color: rgba(96,165,250,0.5); }
+.share-btn .ico { font-size: 16px; }
+.share-btn.whatsapp {
+  background: rgba(37,211,102,0.16);
+  border-color: rgba(37,211,102,0.4);
+  color: #4ade80;
+}
+.share-btn.whatsapp:hover { background: rgba(37,211,102,0.26); }
+
+.rec-badge .blink {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--danger);
+  animation: blink 1s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+/* ===== Corpo ===== */
+.room-body {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  padding: 16px 18px;
+  min-height: 0;
+}
+
+.stage {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.videos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 14px;
+  align-content: start;
+}
+
+.videos > div,
+.video-wrapper {
+  position: relative;
+  background: #000;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  aspect-ratio: 16 / 9;
+  box-shadow: 0 10px 28px rgba(2,6,23,0.45);
+}
+
+.videos video,
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* espelha apenas o próprio vídeo (efeito espelho, como Zoom/Meet).
+   Os outros participantes continuam normais. */
+#localVideo.mirror { transform: scaleX(-1); }
 
 .videos span,
+.nome-video,
 .nameTag {
-position:absolute;
-bottom:5px;
-left:5px;
-background:rgba(0,0,0,0.6);
-padding:4px 8px;
-border-radius:6px;
-font-size:12px;
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
 }
 
-.controls{
-margin-top:20px;
+/* ===== Painel de chat ===== */
+.chat-panel {
+  width: 340px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.controls button{
-padding:10px 15px;
-margin:5px;
-border:none;
-border-radius:8px;
-cursor:pointer;
-background:#3b82f6;
-color:white;
+.chat-head {
+  padding: 14px 18px;
+  font-weight: 700;
+  font-size: 14.5px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.off{
-background:#ef4444 !important;
+#messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
 }
 
-#chatBox{
-max-width:500px;
-margin:20px auto;
+.chat-input {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--border);
 }
 
-#messages{
-height:200px;
-overflow-y:auto;
-background:#020617;
-padding:10px;
-border-radius:10px;
+.chat-input input {
+  flex: 1;
+  width: auto;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  font-size: 14px;
+}
+.chat-input input:focus {
+  outline: none;
+  border-color: #60a5fa;
+  box-shadow: 0 0 12px rgba(59,130,246,0.25);
+}
+
+.chat-input button {
+  margin: 0;
+  width: 46px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), #2563eb);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: none;
+}
+.chat-input button:hover { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+
+/* ===== Barra de controles ===== */
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: rgba(8,14,28,0.75);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  flex-wrap: wrap;
+}
+
+.controls button {
+  margin: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 20px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s ease;
+  box-shadow: none;
+  padding: 0;
+}
+
+.controls button:hover {
+  background: rgba(59,130,246,0.18);
+  border-color: rgba(96,165,250,0.5);
+  transform: translateY(-2px);
+}
+
+.controls button.leave {
+  width: auto;
+  border-radius: 28px;
+  padding: 0 22px;
+  gap: 8px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border-color: transparent;
+  font-size: 15px;
+  font-weight: 600;
+}
+.controls button.leave:hover { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+
+.controls button.off {
+  background: rgba(239,68,68,0.85) !important;
+  border-color: transparent;
+  color: #fff;
+}
+
+/* ===== Overrides do style.css externo (alta especificidade por ID) ===== */
+#chatBox.chat-panel {
+  position: static;
+  right: auto;
+  bottom: auto;
+  width: 340px;
+  padding: 0;
+  background: var(--surface);
+  border-radius: 16px;
+}
+
+#chatBox #messages {
+  height: auto;
+  flex: 1;
+  margin-bottom: 0;
+}
+
+@media (max-width: 860px) {
+  .room-body { flex-direction: column; }
+  .chat-panel,
+  #chatBox.chat-panel { width: 100%; height: 240px; flex-shrink: 0; }
+  .videos { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 
 <body>
 
-<h1>🚀 Sala Nexy</h1>
+<div class="room">
 
-<div id="recStatus" style="
-display:none;
-background:red;
-color:white;
-padding:5px 10px;
-border-radius:8px;
-width:fit-content;
-margin:10px auto;
-font-weight:bold;
-">
-🔴 Gravando reunião...
-</div>
+  <!-- Topo -->
+  <header class="room-top">
+    <div class="left">
+      <button class="back-btn" onclick="encerrarReuniao()" title="Voltar ao dashboard">⬅ Voltar</button>
+      <div class="brand-dot">N</div>
+      <div>
+        <h1>Sala Nexy</h1>
+        <div class="sub" id="roomCode">Reunião em andamento</div>
+      </div>
+    </div>
 
-<div class="videos">
-    <video id="localVideo" autoplay muted playsinline></video>
-</div>
+    <div class="top-actions">
+      <div class="rec-badge" id="recStatus">
+        <span class="blink"></span> Gravando reunião...
+      </div>
 
-<div class="controls">
-    <button onclick="toggleCamera()">📷</button>
-    <button onclick="toggleMic()">🎤</button>
-    <button onclick="compartilharTela()">🖥️ Tela</button>
-    <button onclick="encerrarReuniao()">❌ Sair</button>
-    <button onclick="iniciarGravacao()">🎥 Gravar</button>
-    <button onclick="pararGravacao()">⏹️ Parar</button>
-</div>
+      <div class="invite-wrap">
+        <button class="invite-btn" onclick="toggleConvite()">🔗 Convidar</button>
 
-<div id="chatBox">
-    <div id="messages"></div>
-    <input id="msgInput" placeholder="Digite algo...">
-    <button id="btnEnviar">Enviar</button>
+        <div class="invite-pop" id="invitePop">
+          <div class="invite-pop-title">Compartilhe este link para convidar</div>
+          <div class="invite-row">
+            <input id="inviteLink" readonly>
+            <button onclick="copiarConvite(this)">📋 Copiar</button>
+          </div>
+
+          <div class="invite-share">
+            <a class="share-btn whatsapp" id="shareWhatsapp" target="_blank" rel="noopener">
+              <span class="ico">💬</span> WhatsApp
+            </a>
+            <a class="share-btn" id="shareEmail">
+              <span class="ico">✉️</span> E-mail
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Aviso de câmera / HTTPS -->
+  <div id="cameraAviso" class="camera-aviso"></div>
+
+  <!-- Corpo: vídeos + chat -->
+  <div class="room-body">
+    <div class="stage">
+      <div class="videos">
+        <div class="video-wrapper">
+          <video id="localVideo" class="mirror" autoplay muted playsinline></video>
+          <span id="localNome">Você</span>
+        </div>
+      </div>
+    </div>
+
+    <aside class="chat-panel" id="chatBox">
+      <div class="chat-head">💬 Chat da reunião</div>
+      <div id="messages"></div>
+      <div class="chat-input">
+        <input id="msgInput" placeholder="Digite algo... (use @nexy para a IA)">
+        <button id="btnEnviar">➤</button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Controles -->
+  <footer class="controls">
+    <button onclick="toggleCamera(this)" title="Câmera">📷</button>
+    <button onclick="toggleMic(this)" title="Microfone">🎤</button>
+    <button onclick="compartilharTela()" title="Compartilhar tela">🖥️</button>
+    <button onclick="iniciarGravacao()" title="Gravar">🎥</button>
+    <button onclick="pararGravacao()" title="Parar gravação">⏹️</button>
+    <button class="leave" onclick="encerrarReuniao()" title="Sair">❌ Sair</button>
+  </footer>
+
 </div>
 
 <script>
-function toggleCamera(){
+function toggleCamera(btn){
     const track = window.localStream?.getVideoTracks()[0];
     if(!track) return;
     track.enabled = !track.enabled;
+    if (btn) btn.classList.toggle("off", !track.enabled);
 }
 
-function toggleMic(){
+function toggleMic(btn){
     const track = window.localStream?.getAudioTracks()[0];
     if(!track) return;
     track.enabled = !track.enabled;
+    if (btn) btn.classList.toggle("off", !track.enabled);
 }
+
+// mostra o código da sala no topo
+const _roomCode = window.location.pathname.split("/")[2];
+if (_roomCode) {
+  document.getElementById("roomCode").innerText = "Código: " + _roomCode;
+}
+
+// monta o link de convite (mesma URL base do backend / ngrok)
+async function montarLinkConvite() {
+  let base = window.location.origin;
+  try {
+    const res = await fetch("/config");
+    const data = await res.json();
+    if (data && data.base_url) base = data.base_url.replace(/\/$/, "");
+  } catch (e) {
+    console.warn("Não foi possível obter base_url, usando origem atual.", e);
+  }
+  const link = base + "/meeting/" + _roomCode;
+  const input = document.getElementById("inviteLink");
+  if (input) input.value = link;
+
+  // mensagem padrão do convite
+  const texto =
+    "Você foi convidado para uma reunião na Nexy!\n\n" +
+    "Código da sala: " + (_roomCode || "") + "\n" +
+    "Entre por aqui: " + link;
+
+  // WhatsApp
+  const wpp = document.getElementById("shareWhatsapp");
+  if (wpp) wpp.href = "https://wa.me/?text=" + encodeURIComponent(texto);
+
+  // E-mail
+  const mail = document.getElementById("shareEmail");
+  if (mail) {
+    mail.href =
+      "mailto:?subject=" + encodeURIComponent("Convite para reunião na Nexy") +
+      "&body=" + encodeURIComponent(texto);
+  }
+}
+montarLinkConvite();
+
+function toggleConvite() {
+  document.getElementById("invitePop").classList.toggle("open");
+}
+
+function copiarConvite(btn) {
+  const input = document.getElementById("inviteLink");
+  if (!input || !input.value) return;
+  navigator.clipboard.writeText(input.value)
+    .then(() => {
+      if (!btn) return;
+      const txt = btn.innerText;
+      btn.innerText = "✅ Copiado";
+      setTimeout(() => { btn.innerText = txt; }, 1800);
+    })
+    .catch(() => alert("Erro ao copiar o link."));
+}
+
+// fecha o painel ao clicar fora
+document.addEventListener("click", (e) => {
+  const wrap = document.querySelector(".invite-wrap");
+  const pop = document.getElementById("invitePop");
+  if (wrap && pop && !wrap.contains(e.target)) {
+    pop.classList.remove("open");
+  }
+});
 </script>
 
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>

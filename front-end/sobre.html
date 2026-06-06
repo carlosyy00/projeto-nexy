@@ -21,31 +21,119 @@ body {
     padding: 30px;
 }
 
-h1 {
-    text-align: center;
-    margin-bottom: 30px;
+/* Logo no topo (no lugar do título) */
+.logo-top {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0 36px;
+}
+
+.logo-top img {
+    width: 320px;
+    max-width: 80vw;
+    height: auto;
+    filter: drop-shadow(0 14px 34px rgba(59,130,246,0.35));
 }
 
 .card {
     background: #1e293b;
-    padding: 20px;
-    border-radius: 12px;
+    padding: 22px;
+    border-radius: 14px;
     margin-bottom: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid rgba(148,163,184,0.12);
+    transition: transform 0.28s ease, box-shadow 0.28s ease,
+                border-color 0.28s ease, background 0.28s ease;
 }
 
-h2 {
+/* Animação ao passar o mouse */
+.card:hover {
+    transform: translateY(-6px) scale(1.01);
+    border-color: rgba(96,165,250,0.55);
+    box-shadow: 0 20px 44px rgba(2,6,23,0.6),
+                0 0 0 1px rgba(96,165,250,0.18),
+                0 0 26px rgba(59,130,246,0.18);
+    background: linear-gradient(180deg, #1e293b 0%, #243049 100%);
+}
+
+/* o título do card desliza levemente no hover */
+.card h2 {
     color: #3b82f6;
+    transition: transform 0.28s ease, color 0.28s ease;
+}
+.card:hover h2 {
+    transform: translateX(4px);
+    color: #60a5fa;
+}
+
+.card p { line-height: 1.65; color: #cbd5e1; margin: 0; }
+.card p + p { margin-top: 12px; }
+
+/* Lista de diferenciais */
+.info-list { list-style: none; margin: 8px 0 0; padding: 0; }
+.info-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid rgba(148,163,184,0.1);
+    line-height: 1.5;
+    color: #e2e8f0;
+}
+.info-list li:last-child { border-bottom: none; }
+.info-list .ic { font-size: 18px; line-height: 1.4; flex-shrink: 0; width: 24px; text-align: center; }
+
+/* Lista de tecnologias em "chips" */
+.tech-list {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 10px;
+}
+.tech-list li {
+    background: rgba(59,130,246,0.08);
+    border: 1px solid rgba(96,165,250,0.18);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #cbd5e1;
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+.tech-list li:hover {
+    border-color: rgba(96,165,250,0.5);
+    background: rgba(59,130,246,0.16);
+    transform: translateY(-2px);
+}
+
+/* destaque do comando @nexy */
+.cmd {
+    background: rgba(124,58,237,0.22);
+    color: #c4b5fd;
+    padding: 2px 9px;
+    border-radius: 6px;
+    font-family: 'Consolas','Courier New',monospace;
+    font-size: 0.95em;
 }
 
 button {
-    padding: 12px;
+    padding: 12px 18px;
     border: none;
     border-radius: 8px;
     background: #3b82f6;
     color: white;
     cursor: pointer;
     margin-top: 20px;
+    font-size: 14px;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(59,130,246,0.35);
 }
 </style>
 </head>
@@ -54,48 +142,77 @@ button {
 
 <div class="container">
 
-<h1>🚀 Sobre o Nexy</h1>
+<div class="logo-top">
+  <img src="/img/nexy-logo.svg" alt="Nexy">
+</div>
 
 <div class="card">
-<h2>O que é o Nexy?</h2>
+<h2>O que é o NEXY?</h2>
 <p>
-O Nexy é uma plataforma de videoconferência inteligente que integra comunicação em tempo real com inteligência artificial, oferecendo uma experiência mais moderna e produtiva.
+O NEXY é uma plataforma inteligente de videoconferência desenvolvida para unir comunicação em tempo real, colaboração e inteligência artificial em um único ambiente.
+</p>
+<p>
+A solução permite a criação de reuniões online, gerenciamento de usuários e salas, troca de mensagens instantâneas, compartilhamento de tela e interação com uma assistente virtual baseada em IA, proporcionando uma experiência moderna, produtiva e acessível.
 </p>
 </div>
 
 <div class="card">
-<h2>Qual problema ele resolve?</h2>
+<h2>Qual problema o NEXY resolve?</h2>
 <p>
-Muitas plataformas de reunião focam apenas em vídeo e áudio, deixando de lado produtividade e automação. O Nexy busca tornar reuniões mais inteligentes e eficientes.
+Muitas plataformas de reunião oferecem apenas comunicação por áudio e vídeo, exigindo o uso de ferramentas externas para organização, suporte e produtividade.
+</p>
+<p>
+O NEXY centraliza esses recursos em uma única plataforma, permitindo que equipes, estudantes e profissionais realizem reuniões, gerenciem informações e utilizem inteligência artificial sem sair do ambiente da videoconferência.
 </p>
 </div>
 
 <div class="card">
-<h2>Diferenciais</h2>
+<h2>Diferenciais da Plataforma</h2>
+<ul class="info-list">
+  <li><span class="ic">🤖</span> Inteligência Artificial integrada através da Groq e do modelo Llama</li>
+  <li><span class="ic">🎥</span> Videoconferência em tempo real utilizando WebRTC</li>
+  <li><span class="ic">💬</span> Chat integrado com comunicação instantânea</li>
+  <li><span class="ic">🖥️</span> Compartilhamento de tela durante reuniões</li>
+  <li><span class="ic">📊</span> Dashboard administrativo com indicadores e estatísticas</li>
+  <li><span class="ic">👥</span> Gerenciamento completo de usuários e salas</li>
+  <li><span class="ic">📄</span> Relatórios inteligentes com filtros e métricas</li>
+  <li><span class="ic">🔒</span> Controle de acesso com níveis de permissão</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>Tecnologias Utilizadas</h2>
+<ul class="tech-list">
+  <li>Python + Flask</li>
+  <li>Flask-SocketIO</li>
+  <li>MySQL</li>
+  <li>WebRTC</li>
+  <li>Socket.IO</li>
+  <li>HTML, CSS e JavaScript</li>
+  <li>API Groq</li>
+  <li>Modelo Llama</li>
+  <li>Ngrok para acesso externo</li>
+  <li>Stored Procedures e Triggers</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>Inteligência Artificial no NEXY</h2>
 <p>
-🤖 IA integrada dentro da reunião<br>
-🎥 Comunicação em tempo real com WebRTC<br>
-💬 Chat em tempo real<br>
-🖥️ Compartilhamento de tela<br>
-🔗 Links simples para acesso remoto<br>
+A inteligência artificial do NEXY atua como uma assistente virtual integrada ao ambiente de reunião.
+</p>
+<p>
+Por meio do comando <strong class="cmd">@nexy</strong>, os usuários podem realizar perguntas, obter explicações técnicas, esclarecer dúvidas e receber suporte em tempo real, tornando as reuniões mais produtivas e dinâmicas.
 </p>
 </div>
 
 <div class="card">
-<h2>Tecnologias utilizadas</h2>
+<h2>Visão do Projeto</h2>
 <p>
-- Flask + Socket.IO<br>
-- WebRTC<br>
-- MySQL<br>
-- JavaScript puro<br>
-- Integração com IA (Ollama)<br>
+O NEXY foi desenvolvido como um projeto acadêmico com foco em tecnologias modernas de comunicação e inteligência artificial.
 </p>
-</div>
-
-<div class="card">
-<h2>Visão do projeto</h2>
 <p>
-O objetivo do Nexy é evoluir para uma plataforma completa de comunicação e colaboração, unindo inteligência artificial e videoconferência em um só lugar.
+A proposta é evoluir continuamente a plataforma, incorporando novos recursos, melhorias de desempenho e soluções inovadoras para colaboração digital, transformando o NEXY em um ambiente cada vez mais completo para reuniões inteligentes.
 </p>
 </div>
 

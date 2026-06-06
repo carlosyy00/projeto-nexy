@@ -18,6 +18,20 @@ if (!nomeUsuario) {
 let peers = {};
 window.localStream = null;
 
+// nome de cada participante por socket id
+const nomesPorId = {};
+
+function atualizarNome(id, nome) {
+    if (!id || !nome) return;
+    nomesPorId[id] = nome;
+
+    const container = document.getElementById("user_" + id);
+    if (container) {
+        const span = container.querySelector(".nome-video");
+        if (span) span.innerText = nome;
+    }
+}
+
 const config = {
     iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
@@ -26,22 +40,88 @@ const config = {
     ]
 };
 
-async function iniciar() {
-    try {
-        window.localStream = await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: true
-        });
-
-        const localVideo = document.getElementById("localVideo");
-        localVideo.srcObject = window.localStream;
-
-        socket.emit("join", { room, nome: nomeUsuario });
-
-    } catch (erro) {
-        console.error("Erro ao acessar câmera/microfone:", erro);
-        alert("Erro ao acessar câmera ou microfone. Verifique permissões do navegador.");
+function mostrarAvisoCamera(msg, tipo = "erro") {
+    const el = document.getElementById("cameraAviso");
+    if (!el) {
+        alert(msg);
+        return;
     }
+    el.textContent = msg;
+    el.className = "camera-aviso show " + tipo;
+}
+
+async function iniciar() {
+    // getUserMedia só existe em contexto seguro (HTTPS ou localhost).
+    // Em http://IP-local (ex.: 192.168.x.x) o navegador bloqueia câmera/microfone.
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        mostrarAvisoCamera(
+            "Câmera/microfone bloqueados: esta página não está em HTTPS. " +
+            "Para usar a câmera em outro computador ou celular, entre pelo LINK DE CONVITE " +
+            "(que é HTTPS), e não pelo endereço de IP local."
+        );
+        // ainda entra na sala para poder usar o chat
+        socket.emit("join", { room, nome: nomeUsuario });
+        return;
+    }
+
+    // getUserMedia({video,audio}) exige os DOIS dispositivos ao mesmo tempo.
+    // Se faltar um (ex.: tem câmera mas não tem microfone), tentamos em ordem:
+    // câmera+mic  ->  só câmera  ->  só microfone.
+    const tentativas = [
+        { video: true, audio: true },
+        { video: true, audio: false },
+        { video: false, audio: true }
+    ];
+
+    let ultimoErro = null;
+    for (const constraints of tentativas) {
+        try {
+            window.localStream = await navigator.mediaDevices.getUserMedia(constraints);
+            break;
+        } catch (e) {
+            ultimoErro = e;
+            console.warn("getUserMedia falhou:", constraints, e.name);
+        }
+    }
+
+    if (!window.localStream) {
+        mostrarAvisoCamera(
+            "Não foi possível acessar câmera nem microfone (" +
+            (ultimoErro ? ultimoErro.name : "desconhecido") + "). " +
+            "Verifique se há câmera/microfone conectados e as permissões do navegador."
+        );
+    } else {
+        const temVideo = window.localStream.getVideoTracks().length > 0;
+        const temAudio = window.localStream.getAudioTracks().length > 0;
+
+        if (!temVideo) {
+            mostrarAvisoCamera(
+                "Você entrou apenas com áudio — nenhuma câmera disponível foi encontrada.",
+                "aviso"
+            );
+        } else if (!temAudio) {
+            mostrarAvisoCamera(
+                "Câmera ligada, mas nenhum microfone foi encontrado, então você não " +
+                "consegue falar. Conecte um microfone ou fone com mic (ex.: seus AirPods) " +
+                "e recarregue a página para ativar o áudio.",
+                "aviso"
+            );
+        }
+    }
+
+    const localVideo = document.getElementById("localVideo");
+    if (localVideo && window.localStream) {
+        localVideo.srcObject = window.localStream;
+        localVideo.play().catch(() => {});
+    }
+
+    // mostra o próprio nome no vídeo local
+    const localNome = document.getElementById("localNome");
+    if (localNome && nomeUsuario) {
+        localNome.innerText = nomeUsuario + " (você)";
+    }
+
+    socket.emit("join", { room, nome: nomeUsuario });
 }
 
 function criarPeer(id) {
@@ -71,7 +151,7 @@ function criarPeer(id) {
 
             const nome = document.createElement("span");
             nome.classList.add("nome-video");
-            nome.innerText = "Usuário";
+            nome.innerText = nomesPorId[id] || "Usuário";
 
             container.appendChild(video);
             container.appendChild(nome);
@@ -105,6 +185,13 @@ function criarPeer(id) {
 /* ================= SOCKET ================= */
 
 socket.on("all_users", async (data) => {
+    // registra os nomes dos participantes já presentes
+    if (Array.isArray(data.usuarios)) {
+        data.usuarios.forEach(u => {
+            if (u.id !== socket.id) atualizarNome(u.id, u.nome);
+        });
+    }
+
     for (let id of data.users) {
         if (id === socket.id) continue;
 
@@ -151,6 +238,9 @@ socket.on("ice", async ({ from, candidate }) => {
 });
 
 socket.on("user_joined", (data) => {
+    // registra/atualiza o nome do participante que entrou
+    atualizarNome(data.id, data.nome);
+
     const hora = new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit"
@@ -340,6 +430,8 @@ async function compartilharTela() {
 
         const localVideo = document.getElementById("localVideo");
         localVideo.srcObject = screenStream;
+        // tela compartilhada não deve ser espelhada
+        localVideo.classList.remove("mirror");
 
         screenTrack.onended = async () => {
             const cameraTrack = window.localStream?.getVideoTracks()[0];
@@ -353,6 +445,8 @@ async function compartilharTela() {
             });
 
             localVideo.srcObject = window.localStream;
+            // volta a espelhar a câmera
+            localVideo.classList.add("mirror");
         };
 
     } catch (err) {

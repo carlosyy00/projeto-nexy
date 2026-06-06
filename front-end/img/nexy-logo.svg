@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1450 550" fill="none">
+  <defs>
+    <linearGradient id="nexyGrad" x1="0" y1="0" x2="1" y2="0.4">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="0.5" stop-color="#6366f1"/>
+      <stop offset="1" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <polygon points="212.0,223.0 287.0,223.0 283.0,231.0 100.0,524.0 24.0,525.0 212.0,224.0" fill="url(#nexyGrad)"/>
+  <polygon points="308.0,259.0 416.0,430.0 381.0,489.0 375.0,485.0 272.0,320.0 308.0,260.0" fill="url(#nexyGrad)"/>
+  <polygon points="591.0,223.0 665.0,224.0 478.0,523.0 401.0,525.0 590.0,224.0" fill="url(#nexyGrad)"/>
+  <polygon points="970.0,268.0 1007.0,329.0 884.0,525.0 573.0,525.0 644.0,412.0 596.0,410.0 636.0,346.0 871.0,346.0 832.0,410.0 720.0,410.0 683.0,468.0 844.0,469.0 970.0,269.0" fill="url(#nexyGrad)"/>
+  <polygon points="712.0,224.0 948.0,224.0 910.0,286.0 672.0,288.0 711.0,225.0" fill="url(#nexyGrad)"/>
+  <polygon points="922.7,100.9 965.6,100.9 1013.7,177.4 992.3,212.8 922.7,101.4" fill="url(#nexyGrad)"/>
+  <polygon points="1023.0,182.0 1061.0,242.0 1025.0,301.0 1019.0,297.0 986.0,242.0 1023.0,183.0" fill="url(#nexyGrad)"/>
+  <polygon points="1081.0,100.9 1123.9,101.4 1054.3,212.8 1032.9,177.4 1080.4,101.4" fill="url(#nexyGrad)"/>
+  <polygon points="1350.0,224.0 1425.0,225.0 1237.0,525.0 1163.0,525.0 1040.0,329.0 1077.0,268.0 1200.0,464.0 1350.0,225.0" fill="url(#nexyGrad)"/>
+  <polygon points="1198.0,224.0 1268.0,224.0 1289.0,271.0 1249.0,335.0 1199.0,225.0" fill="url(#nexyGrad)"/>
+</svg>

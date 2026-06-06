@@ -8,74 +8,316 @@
 <link rel="stylesheet" href="/css/style.css">
 
 <style>
-body {
+* {
   margin: 0;
-  background: #0f172a;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: radial-gradient(circle at top, rgba(96,165,250,0.12), transparent 28%),
+              radial-gradient(circle at 20% 30%, rgba(59,130,246,0.08), transparent 20%),
+              linear-gradient(180deg, #08101f 0%, #0f172a 35%, #111827 100%);
   color: white;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+.container {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+}
+
+.branding {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.branding .logo img {
+  width: 300px;
+  max-width: 80vw;
+  height: auto;
+  display: block;
+}
+
+.logo {
+  max-width: 360px;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  filter: drop-shadow(0 30px 50px rgba(2,6,23,0.6));
+}
+
+.logo img {
+  width: 145px;
+  display: block;
+  margin: 0 auto;
+}
+
+.brand-name {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  background: linear-gradient(90deg, #60a5fa, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .card {
-  background: #1e293b;
-  padding: 30px;
-  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(30,41,59,0.95) 0%, rgba(45,55,72,0.9) 100%);
+  padding: 42px 44px;
+  border-radius: 18px;
   width: 100%;
-  max-width: 380px;
+  max-width: 420px;
+  box-shadow: 0 20px 40px rgba(2,6,23,0.6);
+  border-left: 1px solid rgba(255,255,255,0.02);
+  border-top: 1px solid rgba(255,255,255,0.02);
+  backdrop-filter: blur(6px);
+  animation: slideUp 0.7s cubic-bezier(.2,.9,.3,1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+h2 {
+  font-size: 28px;
+  margin-bottom: 25px;
+  text-align: center;
+  background: linear-gradient(135deg, #60a5fa, #38bdf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 input {
   width: 100%;
-  padding: 12px;
-  margin: 8px 0;
+  padding: 14px 16px;
+  margin: 12px 0;
   border: none;
-  border-radius: 6px;
-  box-sizing: border-box;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+input:focus {
+  outline: none;
+  background: rgba(59, 130, 246, 0.15);
+  border-color: #60a5fa;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
 }
 
 button {
   width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  background: #3b82f6;
+  padding: 14px;
+  margin-top: 20px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 button:hover {
-  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+button:active {
+  transform: translateY(0);
 }
 
 .link-button {
-  background: transparent;
-  color: #38bdf8;
-  padding: 0;
-  margin: 10px 0 0;
-  width: auto;
+  background: transparent !important;
+  color: #60a5fa !important;
+  padding: 0 !important;
+  margin: 16px 0 0 !important;
+  width: auto !important;
+  font-weight: 600;
+  border: none !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: normal;
+  transition: color 0.3s ease;
+}
+
+.link-button:hover {
+  color: #38bdf8 !important;
+  transform: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
-  <h2>Cadastro</h2>
+<canvas id="particleCanvas"></canvas>
 
-  <input id="nome" placeholder="Nome">
-  <input id="email" placeholder="Email">
-  <input id="senha" type="password" placeholder="Senha">
+<div class="container">
+  <div class="branding">
+    <div class="logo">
+      <img src="/img/nexy-logo.svg" alt="Nexy">
+    </div>
+  </div>
 
-  <button onclick="register()">Cadastrar</button>
+  <div class="card">
+    <h2>Cadastro</h2>
 
-  <button class="link-button" onclick="irLogin()">Já tenho conta</button>
+    <input id="nome" placeholder="Nome">
+    <input id="email" placeholder="Email">
+    <input id="senha" type="password" placeholder="Senha">
+
+    <button onclick="register()">Cadastrar</button>
+
+    <button class="link-button" onclick="irLogin()">Já tenho conta</button>
+  </div>
 </div>
 
 <script>
+// Efeito de Galáxia com Partículas Flutuantes
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+function createParticle() {
+  const size = Math.random() * 2.8 + 0.5;
+  const speed = (Math.random() - 0.5) * 0.16;
+  return {
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    size,
+    speedX: speed * (Math.random() > 0.5 ? 1 : -1),
+    speedY: speed * (Math.random() > 0.5 ? 1 : -1),
+    opacity: Math.random() * 0.55 + 0.22,
+    baseOpacity: Math.random() * 0.35 + 0.25,
+    color: ['#60a5fa', '#38bdf8', '#7c3aed', '#93c5fd', '#a5b4fc'][Math.floor(Math.random() * 5)],
+    twinkle: Math.random() * Math.PI * 2,
+    twinkleSpeed: Math.random() * 0.04 + 0.01,
+  };
+}
+
+function initParticles() {
+  particles = [];
+  for (let i = 0; i < 150; i++) {
+    particles.push(createParticle());
+  }
+}
+
+function drawNebula() {
+  const gradient = ctx.createRadialGradient(canvas.width * 0.75, canvas.height * 0.2, 0,
+                                            canvas.width * 0.75, canvas.height * 0.2, canvas.width * 0.45);
+  gradient.addColorStop(0, 'rgba(56,189,248,0.18)');
+  gradient.addColorStop(0.25, 'rgba(56,189,248,0.08)');
+  gradient.addColorStop(0.8, 'rgba(15,23,42,0)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const overlay = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  overlay.addColorStop(0, 'rgba(15,23,42,0.15)');
+  overlay.addColorStop(1, 'rgba(15,23,42,0.55)');
+  ctx.fillStyle = overlay;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawNebula();
+
+  particles.forEach(p => {
+    p.x += p.speedX;
+    p.y += p.speedY;
+    p.twinkle += p.twinkleSpeed;
+    p.opacity = Math.max(0.05, p.baseOpacity + Math.sin(p.twinkle) * 0.18);
+
+    if (p.x > canvas.width) p.x = 0;
+    if (p.x < 0) p.x = canvas.width;
+    if (p.y > canvas.height) p.y = 0;
+    if (p.y < 0) p.y = canvas.height;
+
+    ctx.globalAlpha = p.opacity;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+
+    if (p.size > 2.5) {
+      ctx.strokeStyle = p.color;
+      ctx.globalAlpha = p.opacity * 0.25;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  });
+
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(animate);
+}
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  initParticles();
+});
+
+initParticles();
+animate();
+
 function irLogin() {
   window.location.href = "/loginpage";
 }
