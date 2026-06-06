@@ -1,10 +1,185 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nexy IA</title>
 <link rel="stylesheet" href="/css/style.css">
 <script src="/js/script.js"></script>
 
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --surface: #16213a;
+  --surface-2: #1c2742;
+  --border: rgba(148,163,184,0.14);
+  --primary: #3b82f6;
+  --text: #e8eefc;
+  --muted: #94a3b8;
+}
+
+/* sobrescreve o reset centralizado do style.css externo */
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 85% -10%, rgba(56,189,248,0.10), transparent 38%),
+    radial-gradient(circle at 0% 100%, rgba(124,58,237,0.10), transparent 38%),
+    linear-gradient(180deg, #08101f 0%, #0b1120 60%);
+  color: var(--text);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* esconde o h1 padrão da página (usamos o header do card) */
+body > h1 { display: none; }
+/* o botão voltar solto é reposicionado dentro do header via CSS */
+body > .btn-voltar { display: none; }
+
+.chat-shell {
+  width: 100%;
+  max-width: 760px;
+  height: 88vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: rgba(22,33,58,0.85);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(2,6,23,0.6);
+  backdrop-filter: blur(8px);
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(8,14,28,0.5);
+}
+
+.chat-header .ai-avatar {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), #7c3aed);
+  display: grid; place-items: center;
+  font-size: 20px;
+  box-shadow: 0 6px 16px rgba(59,130,246,0.4);
+}
+
+.chat-header .info h2 { font-size: 16.5px; font-weight: 700; }
+.chat-header .info .status {
+  font-size: 12px; color: #4ade80;
+  display: flex; align-items: center; gap: 6px;
+}
+.chat-header .info .status::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: #4ade80; box-shadow: 0 0 8px #4ade80;
+}
+
+.chat-header .back {
+  margin-right: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: none;
+  margin-top: 0;
+  margin-bottom: 0;
+  transition: all 0.2s ease;
+}
+.chat-header .back:hover {
+  border-color: rgba(96,165,250,0.45);
+  background: rgba(59,130,246,0.12);
+  transform: translateY(-1px);
+}
+
+/* área das mensagens (sobrescreve o #chat do style.css) */
+#chat {
+  flex: 1;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  height: auto;
+  overflow-y: auto;
+  padding: 22px;
+  background: transparent;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#chat::-webkit-scrollbar { width: 8px; }
+#chat::-webkit-scrollbar-thumb {
+  background: rgba(148,163,184,0.25); border-radius: 8px;
+}
+
+/* barra de envio */
+.chat-compose {
+  display: flex;
+  gap: 10px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+  background: rgba(8,14,28,0.5);
+}
+
+#mensagem {
+  flex: 1;
+  width: auto;
+  margin: 0;
+  padding: 13px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  font-size: 14.5px;
+}
+#mensagem:focus {
+  outline: none;
+  border-color: #60a5fa;
+  box-shadow: 0 0 14px rgba(59,130,246,0.25);
+}
+
+.chat-compose button {
+  margin: 0;
+  padding: 0 22px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), #2563eb);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(59,130,246,0.3);
+  transition: all 0.2s ease;
+}
+.chat-compose button:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+@media (max-width: 700px) {
+  .chat-shell { height: 100vh; max-width: 100%; border-radius: 0; border: none; }
+  body { padding: 0; }
+}
+</style>
 </head>
 
 <body>
@@ -12,15 +187,35 @@
 <h1>Chat com IA</h1>
 <button onclick="voltar()" class="btn-voltar">⬅ Voltar</button>
 
-<div id="chat"></div>
+<div class="chat-shell">
 
-<input type="text" id="mensagem" placeholder="Digite aqui">
+  <div class="chat-header">
+    <button class="back" onclick="voltar()">⬅ Voltar</button>
+    <div class="ai-avatar">🤖</div>
+    <div class="info">
+      <h2>Nexy IA</h2>
+      <div class="status">Online</div>
+    </div>
+  </div>
 
-<button onclick="enviarMensagem()">Enviar</button>
+  <div id="chat"></div>
+
+  <div class="chat-compose">
+    <input type="text" id="mensagem" placeholder="Digite sua mensagem...">
+    <button onclick="enviarMensagem()">Enviar</button>
+  </div>
+
+</div>
 
 <script src="/script.js"></script>
 <script src="/js/app.js"></script>
 
+<script>
+// envia com Enter
+document.getElementById("mensagem").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") enviarMensagem();
+});
+</script>
 
 </body>
 </html>

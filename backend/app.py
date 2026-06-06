@@ -98,6 +98,126 @@ def h(valor):
     return escape(str(valor)) if valor is not None else ""
 
 
+# ===== Tema visual compartilhado das páginas administrativas =====
+ADMIN_CSS = """
+:root{
+  --bg:#0b1120; --surface:#16213a; --surface-2:#1c2742;
+  --border:rgba(148,163,184,0.14); --primary:#3b82f6; --primary-2:#2563eb;
+  --text:#e8eefc; --muted:#94a3b8; --danger:#ef4444;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+  background:
+    radial-gradient(circle at 85% -10%, rgba(56,189,248,0.10), transparent 35%),
+    radial-gradient(circle at 0% 100%, rgba(124,58,237,0.10), transparent 35%),
+    linear-gradient(180deg,#08101f 0%, #0b1120 60%);
+  color:var(--text); min-height:100vh;
+}
+a{color:#60a5fa; text-decoration:none;}
+.page{max-width:1100px; margin:0 auto; padding:28px 26px 60px;}
+.page.center{min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+.page.center .page-head{justify-content:center;}
+.page.center .form-card{width:100%;}
+.page-head{display:flex; align-items:center; gap:18px; margin-bottom:26px;}
+.page-head .logo{height:46px; width:auto;}
+.page-head h1{font-size:24px; font-weight:700; letter-spacing:.3px; margin:0;}
+
+.toolbar{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:22px;}
+
+.btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:10px 16px; border-radius:10px; font-size:14px; font-weight:600;
+  border:1px solid var(--border); background:var(--surface-2); color:var(--text);
+  cursor:pointer; transition:all .2s ease; text-decoration:none;
+}
+.btn:hover{border-color:rgba(96,165,250,.5); background:rgba(59,130,246,.14); transform:translateY(-1px);}
+.btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary-2)); border-color:transparent; box-shadow:0 8px 22px rgba(59,130,246,.3);}
+.btn.primary:hover{background:linear-gradient(135deg,#2563eb,#1d4ed8);}
+.btn.danger{background:rgba(239,68,68,.16); border-color:rgba(239,68,68,.4); color:#fca5a5;}
+.btn.danger:hover{background:rgba(239,68,68,.28); border-color:rgba(239,68,68,.6); color:#fecaca;}
+.btn.ghost{background:transparent;}
+.btn.sm{padding:7px 12px; font-size:13px;}
+
+.panel{background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:0 12px 34px rgba(2,6,23,.4);}
+.table-wrap{width:100%; overflow-x:auto;}
+table{width:100%; border-collapse:collapse; min-width:640px;}
+thead th{
+  text-align:left; padding:14px 18px; font-size:12px; text-transform:uppercase;
+  letter-spacing:.08em; color:var(--muted); background:rgba(2,6,23,.5);
+  border-bottom:1px solid var(--border); font-weight:700; white-space:nowrap;
+}
+tbody td{padding:14px 18px; border-bottom:1px solid var(--border); font-size:14px; vertical-align:middle;}
+tbody tr{transition:background .18s ease;}
+tbody tr:hover{background:rgba(59,130,246,.07);}
+tbody tr:last-child td{border-bottom:none;}
+.id-cell{color:var(--muted); font-variant-numeric:tabular-nums;}
+.actions{display:flex; gap:8px; flex-wrap:wrap;}
+
+.badge{display:inline-block; padding:3px 11px; border-radius:999px; font-size:12px; font-weight:600; border:1px solid transparent; text-transform:capitalize;}
+.badge.admin{background:rgba(124,58,237,.2); color:#c4b5fd; border-color:rgba(124,58,237,.4);}
+.badge.user{background:rgba(37,99,235,.2); color:#93c5fd; border-color:rgba(96,165,250,.3);}
+.badge.on{background:rgba(34,197,94,.18); color:#4ade80; border-color:rgba(34,197,94,.4);}
+.badge.off{background:rgba(148,163,184,.18); color:#cbd5e1; border-color:rgba(148,163,184,.35);}
+
+.empty{padding:38px; text-align:center; color:var(--muted); font-size:14px;}
+
+.pagination{display:flex; align-items:center; gap:8px; margin-top:20px; flex-wrap:wrap;}
+.pagination .lbl{color:var(--muted); font-size:13px; margin-right:4px;}
+.pagination a{
+  display:inline-grid; place-items:center; min-width:38px; height:38px; padding:0 10px;
+  border-radius:10px; border:1px solid var(--border); background:var(--surface);
+  color:var(--text); font-weight:600; transition:all .2s ease;
+}
+.pagination a:hover{border-color:rgba(96,165,250,.5); background:rgba(59,130,246,.14); transform:translateY(-1px);}
+.pagination a.active{background:linear-gradient(135deg,var(--primary),var(--primary-2)); border-color:transparent; box-shadow:0 6px 16px rgba(59,130,246,.3);}
+
+.form-card{background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:26px; max-width:560px; box-shadow:0 12px 34px rgba(2,6,23,.4);}
+.filters{display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:22px; box-shadow:0 12px 34px rgba(2,6,23,.4);}
+.field{display:flex; flex-direction:column; gap:6px;}
+.field label{font-size:12.5px; color:var(--muted); font-weight:600;}
+input, select{
+  padding:11px 13px; border-radius:10px; border:1px solid var(--border);
+  background:rgba(255,255,255,.06); color:var(--text); font-size:14px; outline:none;
+  transition:border-color .2s ease, box-shadow .2s ease;
+}
+input::placeholder{color:rgba(148,163,184,.7);}
+input:focus, select:focus{border-color:#60a5fa; box-shadow:0 0 0 3px rgba(59,130,246,.18);}
+select{appearance:none; -webkit-appearance:none; cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 12px center; padding-right:34px;}
+select option{background:#1c2742; color:#e8eefc;}
+.form-card .field{margin-bottom:16px;}
+.form-card input, .form-card select{width:100%;}
+.form-actions{display:flex; gap:10px; margin-top:8px;}
+.link-cell a{display:inline-flex; align-items:center; gap:6px;}
+@media(max-width:600px){ .page{padding:18px 14px 50px;} .page-head h1{font-size:20px;} .page-head .logo{height:38px;} }
+"""
+
+
+def admin_page(title, inner, center=False):
+    """Envolve o conteúdo numa página administrativa com tema e logo no topo."""
+    page_cls = "page center" if center else "page"
+    return f"""<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{title} - Nexy</title>
+<style>{ADMIN_CSS}</style>
+</head>
+<body>
+<div class="{page_cls}">
+  <header class="page-head">
+    <img class="logo" src="/img/nexy-logo.svg" alt="Nexy">
+    <h1>{title}</h1>
+  </header>
+  {inner}
+</div>
+</body>
+</html>"""
+
+
 def contar_tabela(nome_tabela):
     conn = get_db()
     cursor = conn.cursor(dictionary=True)
@@ -361,7 +481,8 @@ def criar_reuniao():
     base = get_base_url()
     link = f"{base}/meeting/{codigo}"
 
-    nome_sala = f"Sala {codigo}"
+    nome_informado = request.args.get("nome", "").strip()
+    nome_sala = nome_informado[:60] if nome_informado else f"Sala {codigo}"
     id_criador = session.get("id_usuario")
 
     conn = get_db()
@@ -385,7 +506,8 @@ def criar_reuniao():
     return jsonify({
         "status": "ok",
         "codigo": codigo,
-        "link": link
+        "link": link,
+        "nome": nome_sala
     })
 
 
@@ -432,75 +554,52 @@ def listar_usuarios():
 
     total_paginas = (total + limite - 1) // limite
 
-    html = """
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <title>Usuários - Nexy</title>
-        <style>
-            body { background:#0f172a; color:white; font-family:Arial; padding:30px; }
-            a { color:#38bdf8; text-decoration:none; }
-            table { width:100%; border-collapse:collapse; background:#1e293b; margin-top:20px; }
-            th, td { padding:12px; border-bottom:1px solid #334155; text-align:left; }
-            th { background:#020617; }
-            .btn { padding:8px 12px; border-radius:6px; background:#3b82f6; color:white; display:inline-block; margin:5px 0; }
-            .danger { background:#ef4444; }
-            .pagination a { margin-right:8px; padding:6px 10px; background:#1e293b; border-radius:5px; }
-        </style>
-    </head>
-    <body>
-        <h1>Gerenciar Usuários</h1>
-        <a class="btn" href="/dashboard">Voltar ao Dashboard</a>
-
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Email</th>
-                <th>Tipo</th>
-                <th>Data de criação</th>
-                <th>Ações</th>
-            </tr>
-    """
-
+    rows = ""
     for u in usuarios:
         tipo = u.get("tipo_usuario", "usuario")
-
-        html += f"""
+        badge = "admin" if tipo == "admin" else "user"
+        rows += f"""
             <tr>
-                <td>{h(u['id_usuario'])}</td>
+                <td class="id-cell">#{h(u['id_usuario'])}</td>
                 <td>{h(u['nome'])}</td>
                 <td>{h(u['email'])}</td>
-                <td>{h(tipo)}</td>
-                <td>{h(u.get('data_criacao', ''))}</td>
-                <td>
-                    <a class="btn" href="/usuarios/editar/{h(u['id_usuario'])}">Editar</a>
-                    <a class="btn danger" href="/usuarios/excluir/{h(u['id_usuario'])}"
-                       onclick="return confirm('Tem certeza que deseja excluir este usuário?')">Excluir</a>
-                </td>
-            </tr>
-        """
+                <td><span class="badge {badge}">{h(tipo)}</span></td>
+                <td>{h(u.get('data_criacao', '') or '—')}</td>
+                <td><div class="actions">
+                    <a class="btn sm" href="/usuarios/editar/{h(u['id_usuario'])}">✏️ Editar</a>
+                    <a class="btn sm danger" href="/usuarios/excluir/{h(u['id_usuario'])}"
+                       onclick="return confirm('Tem certeza que deseja excluir este usuário?')">🗑️ Excluir</a>
+                </div></td>
+            </tr>"""
 
-    html += """
-        </table>
-        <div class="pagination">
-            <p>Páginas:</p>
-    """
+    if not usuarios:
+        rows = '<tr><td colspan="6" class="empty">Nenhum usuário cadastrado.</td></tr>'
 
-    if total_paginas == 0:
-        html += "<p>Nenhum usuário cadastrado.</p>"
-    else:
+    paginacao = ""
+    if total_paginas > 1:
+        links = ""
         for p in range(1, total_paginas + 1):
-            html += f"<a href='/usuarios?pagina={p}'>{p}</a>"
+            cls = "active" if p == pagina else ""
+            links += f'<a class="{cls}" href="/usuarios?pagina={p}">{p}</a>'
+        paginacao = f'<div class="pagination"><span class="lbl">Páginas:</span>{links}</div>'
 
-    html += """
-        </div>
-    </body>
-    </html>
+    inner = f"""
+    <div class="toolbar">
+      <a class="btn" href="/dashboard">← Voltar ao Dashboard</a>
+    </div>
+    <div class="panel"><div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>ID</th><th>Nome</th><th>Email</th><th>Tipo</th><th>Criado em</th><th>Ações</th>
+        </tr></thead>
+        <tbody>{rows}
+        </tbody>
+      </table>
+    </div></div>
+    {paginacao}
     """
 
-    return html
+    return admin_page("Gerenciar Usuários", inner)
 
 
 @app.route("/usuarios/editar/<int:id_usuario>", methods=["GET", "POST"])
@@ -596,40 +695,32 @@ def editar_usuario(id_usuario):
     admin_selected = "selected" if tipo_atual == "admin" else ""
     usuario_selected = "selected" if tipo_atual == "usuario" else ""
 
-    return f"""
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <title>Editar Usuário - Nexy</title>
-        <style>
-            body {{ background:#0f172a; color:white; font-family:Arial; padding:30px; }}
-            input, select {{ width:100%; max-width:400px; padding:10px; margin:8px 0; border-radius:6px; border:none; }}
-            button, a {{ padding:10px 14px; background:#3b82f6; color:white; border:none; border-radius:6px; text-decoration:none; cursor:pointer; }}
-        </style>
-    </head>
-    <body>
-        <h1>Editar Usuário</h1>
-
-        <form method="POST">
-            <label>Nome:</label><br>
-            <input type="text" name="nome" value="{h(usuario['nome'])}" required><br>
-
-            <label>Email:</label><br>
-            <input type="email" name="email" value="{h(usuario['email'])}" required><br>
-
-            <label>Tipo de usuário:</label><br>
-            <select name="tipo_usuario">
-                <option value="usuario" {usuario_selected}>Usuário comum</option>
-                <option value="admin" {admin_selected}>Admin</option>
-            </select><br><br>
-
-            <button type="submit">Salvar alterações</button>
-            <a href="/usuarios">Cancelar</a>
-        </form>
-    </body>
-    </html>
+    inner = f"""
+    <div class="form-card">
+      <form method="POST">
+        <div class="field">
+          <label>Nome</label>
+          <input type="text" name="nome" value="{h(usuario['nome'])}" required>
+        </div>
+        <div class="field">
+          <label>E-mail</label>
+          <input type="email" name="email" value="{h(usuario['email'])}" required>
+        </div>
+        <div class="field">
+          <label>Tipo de usuário</label>
+          <select name="tipo_usuario">
+            <option value="usuario" {usuario_selected}>Usuário comum</option>
+            <option value="admin" {admin_selected}>Admin</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button class="btn primary" type="submit">💾 Salvar alterações</button>
+          <a class="btn" href="/usuarios">Cancelar</a>
+        </div>
+      </form>
+    </div>
     """
+    return admin_page("Editar Usuário", inner, center=True)
 
 
 @app.route("/usuarios/excluir/<int:id_usuario>")
@@ -692,72 +783,50 @@ def listar_salas():
 
     total_paginas = (total + limite - 1) // limite
 
-    html = """
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <title>Salas - Nexy</title>
-        <style>
-            body { background:#0f172a; color:white; font-family:Arial; padding:30px; }
-            a { color:#38bdf8; text-decoration:none; }
-            table { width:100%; border-collapse:collapse; background:#1e293b; margin-top:20px; }
-            th, td { padding:12px; border-bottom:1px solid #334155; text-align:left; }
-            th { background:#020617; }
-            .btn { padding:8px 12px; border-radius:6px; background:#3b82f6; color:white; display:inline-block; margin:5px 0; }
-            .danger { background:#ef4444; }
-            .pagination a { margin-right:8px; padding:6px 10px; background:#1e293b; border-radius:5px; }
-        </style>
-    </head>
-    <body>
-        <h1>Gerenciar Salas</h1>
-        <a class="btn" href="/dashboard">Voltar ao Dashboard</a>
-        <a class="btn" href="/salas/nova">Nova Sala</a>
-
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Nome da sala</th>
-                <th>Link</th>
-                <th>ID Criador</th>
-                <th>Ações</th>
-            </tr>
-    """
-
+    rows = ""
     for s in salas:
-        html += f"""
+        rows += f"""
             <tr>
-                <td>{h(s['id_sala'])}</td>
+                <td class="id-cell">#{h(s['id_sala'])}</td>
                 <td>{h(s['nome_sala'])}</td>
-                <td><a href="{h(s['link'])}" target="_blank">Abrir link</a></td>
-                <td>{h(s['id_criador'])}</td>
-                <td>
-                    <a class="btn" href="/salas/editar/{h(s['id_sala'])}">Editar</a>
-                    <a class="btn danger" href="/salas/excluir/{h(s['id_sala'])}"
-                       onclick="return confirm('Tem certeza que deseja excluir esta sala?')">Excluir</a>
-                </td>
-            </tr>
-        """
+                <td class="link-cell"><a href="{h(s['link'])}" target="_blank">🔗 Abrir link</a></td>
+                <td class="id-cell">{h(s['id_criador'])}</td>
+                <td><div class="actions">
+                    <a class="btn sm" href="/salas/editar/{h(s['id_sala'])}">✏️ Editar</a>
+                    <a class="btn sm danger" href="/salas/excluir/{h(s['id_sala'])}"
+                       onclick="return confirm('Tem certeza que deseja excluir esta sala?')">🗑️ Excluir</a>
+                </div></td>
+            </tr>"""
 
-    html += """
-        </table>
-        <div class="pagination">
-            <p>Páginas:</p>
-    """
+    if not salas:
+        rows = '<tr><td colspan="5" class="empty">Nenhuma sala cadastrada.</td></tr>'
 
-    if total_paginas == 0:
-        html += "<p>Nenhuma sala cadastrada.</p>"
-    else:
+    paginacao = ""
+    if total_paginas > 1:
+        links = ""
         for p in range(1, total_paginas + 1):
-            html += f"<a href='/salas?pagina={p}'>{p}</a>"
+            cls = "active" if p == pagina else ""
+            links += f'<a class="{cls}" href="/salas?pagina={p}">{p}</a>'
+        paginacao = f'<div class="pagination"><span class="lbl">Páginas:</span>{links}</div>'
 
-    html += """
-        </div>
-    </body>
-    </html>
+    inner = f"""
+    <div class="toolbar">
+      <a class="btn" href="/dashboard">← Voltar ao Dashboard</a>
+      <a class="btn primary" href="/salas/nova">＋ Nova Sala</a>
+    </div>
+    <div class="panel"><div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>ID</th><th>Nome da sala</th><th>Link</th><th>Criador</th><th>Ações</th>
+        </tr></thead>
+        <tbody>{rows}
+        </tbody>
+      </table>
+    </div></div>
+    {paginacao}
     """
 
-    return html
+    return admin_page("Gerenciar Salas", inner)
 
 
 @app.route("/salas/nova", methods=["GET", "POST"])
@@ -811,31 +880,21 @@ def nova_sala():
 
         return redirect("/salas")
 
-    return """
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <title>Nova Sala - Nexy</title>
-        <style>
-            body { background:#0f172a; color:white; font-family:Arial; padding:30px; }
-            input { width:100%; max-width:400px; padding:10px; margin:8px 0; border-radius:6px; border:none; }
-            button, a { padding:10px 14px; background:#3b82f6; color:white; border:none; border-radius:6px; text-decoration:none; cursor:pointer; }
-        </style>
-    </head>
-    <body>
-        <h1>Nova Sala</h1>
-
-        <form method="POST">
-            <label>Nome da sala:</label><br>
-            <input type="text" name="nome_sala" required><br><br>
-
-            <button type="submit">Criar sala</button>
-            <a href="/salas">Cancelar</a>
-        </form>
-    </body>
-    </html>
+    inner = """
+    <div class="form-card">
+      <form method="POST">
+        <div class="field">
+          <label>Nome da sala</label>
+          <input type="text" name="nome_sala" placeholder="Ex.: Reunião de equipe" required>
+        </div>
+        <div class="form-actions">
+          <button class="btn primary" type="submit">＋ Criar sala</button>
+          <a class="btn" href="/salas">Cancelar</a>
+        </div>
+      </form>
+    </div>
     """
+    return admin_page("Nova Sala", inner, center=True)
 
 
 @app.route("/salas/editar/<int:id_sala>", methods=["GET", "POST"])
@@ -896,34 +955,25 @@ def editar_sala(id_sala):
     if not sala:
         return "Sala não encontrada."
 
-    return f"""
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <title>Editar Sala - Nexy</title>
-        <style>
-            body {{ background:#0f172a; color:white; font-family:Arial; padding:30px; }}
-            input {{ width:100%; max-width:600px; padding:10px; margin:8px 0; border-radius:6px; border:none; }}
-            button, a {{ padding:10px 14px; background:#3b82f6; color:white; border:none; border-radius:6px; text-decoration:none; cursor:pointer; }}
-        </style>
-    </head>
-    <body>
-        <h1>Editar Sala</h1>
-
-        <form method="POST">
-            <label>Nome da sala:</label><br>
-            <input type="text" name="nome_sala" value="{h(sala['nome_sala'])}" required><br>
-
-            <label>Link:</label><br>
-            <input type="text" name="link" value="{h(sala['link'])}" required><br><br>
-
-            <button type="submit">Salvar alterações</button>
-            <a href="/salas">Cancelar</a>
-        </form>
-    </body>
-    </html>
+    inner = f"""
+    <div class="form-card">
+      <form method="POST">
+        <div class="field">
+          <label>Nome da sala</label>
+          <input type="text" name="nome_sala" value="{h(sala['nome_sala'])}" required>
+        </div>
+        <div class="field">
+          <label>Link</label>
+          <input type="text" name="link" value="{h(sala['link'])}" required>
+        </div>
+        <div class="form-actions">
+          <button class="btn primary" type="submit">💾 Salvar alterações</button>
+          <a class="btn" href="/salas">Cancelar</a>
+        </div>
+      </form>
+    </div>
     """
+    return admin_page("Editar Sala", inner, center=True)
 
 
 @app.route("/salas/excluir/<int:id_sala>")
@@ -1009,88 +1059,65 @@ def relatorio_reunioes():
     cursor.close()
     conn.close()
 
-    html = f"""
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <title>Relatório de Reuniões - Nexy</title>
-
-        <style>
-            body {{ background:#0f172a; color:white; font-family:Arial; padding:30px; }}
-            input, select {{ padding:10px; border-radius:6px; border:none; margin:5px; }}
-            button, a {{ padding:10px 14px; background:#3b82f6; color:white; border:none; border-radius:6px; text-decoration:none; cursor:pointer; }}
-            table {{ width:100%; border-collapse:collapse; background:#1e293b; margin-top:20px; }}
-            th, td {{ padding:12px; border-bottom:1px solid #334155; text-align:left; }}
-            th {{ background:#020617; }}
-            .card {{ background:#1e293b; padding:20px; border-radius:10px; margin-bottom:20px; }}
-        </style>
-    </head>
-
-    <body>
-        <h1>Relatório de Reuniões</h1>
-
-        <a href="/dashboard">Voltar ao Dashboard</a>
-
-        <div class="card" style="margin-top:20px;">
-            <form method="GET">
-                <label>Data inicial:</label>
-                <input type="date" name="data_inicio" value="{h(data_inicio)}">
-
-                <label>Data final:</label>
-                <input type="date" name="data_fim" value="{h(data_fim)}">
-
-                <label>Status:</label>
-                <select name="status">
-                    <option value="">Todos</option>
-                    <option value="em_andamento" {"selected" if status == "em_andamento" else ""}>Em andamento</option>
-                    <option value="finalizada" {"selected" if status == "finalizada" else ""}>Finalizada</option>
-                </select>
-
-                <label>Sala:</label>
-                <input type="text" name="sala" placeholder="Nome da sala" value="{h(sala)}">
-
-                <button type="submit">Filtrar</button>
-            </form>
-        </div>
-
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Sala</th>
-                <th>Início</th>
-                <th>Fim</th>
-                <th>Status</th>
-                <th>Link</th>
-            </tr>
-    """
-
+    rows = ""
     if not reunioes:
-        html += """
-            <tr>
-                <td colspan="6">Nenhuma reunião encontrada com os filtros informados.</td>
-            </tr>
-        """
+        rows = '<tr><td colspan="6" class="empty">Nenhuma reunião encontrada com os filtros informados.</td></tr>'
     else:
         for r in reunioes:
-            html += f"""
+            st = r["status"]
+            badge = "on" if st == "Em andamento" else "off"
+            rows += f"""
                 <tr>
-                    <td>{h(r['id_reuniao'])}</td>
-                    <td>{h(r['nome_sala'])}</td>
+                    <td class="id-cell">#{h(r['id_reuniao'])}</td>
+                    <td>{h(r['nome_sala'] or '—')}</td>
                     <td>{h(r['data_inicio'])}</td>
-                    <td>{h(r['data_fim'])}</td>
-                    <td>{h(r['status'])}</td>
-                    <td><a href="{h(r['link'])}" target="_blank">Abrir</a></td>
-                </tr>
-            """
+                    <td>{h(r['data_fim'] or '—')}</td>
+                    <td><span class="badge {badge}">{h(st)}</span></td>
+                    <td class="link-cell"><a href="{h(r['link'])}" target="_blank">🔗 Abrir</a></td>
+                </tr>"""
 
-    html += """
-        </table>
-    </body>
-    </html>
+    sel_and = "selected" if status == "em_andamento" else ""
+    sel_fin = "selected" if status == "finalizada" else ""
+
+    inner = f"""
+    <div class="toolbar">
+      <a class="btn" href="/dashboard">← Voltar ao Dashboard</a>
+    </div>
+    <form class="filters" method="GET">
+      <div class="field">
+        <label>Data inicial</label>
+        <input type="date" name="data_inicio" value="{h(data_inicio)}">
+      </div>
+      <div class="field">
+        <label>Data final</label>
+        <input type="date" name="data_fim" value="{h(data_fim)}">
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select name="status">
+          <option value="">Todos</option>
+          <option value="em_andamento" {sel_and}>Em andamento</option>
+          <option value="finalizada" {sel_fin}>Finalizada</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Sala</label>
+        <input type="text" name="sala" placeholder="Nome da sala" value="{h(sala)}">
+      </div>
+      <button class="btn primary" type="submit">🔍 Filtrar</button>
+    </form>
+    <div class="panel"><div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>ID</th><th>Sala</th><th>Início</th><th>Fim</th><th>Status</th><th>Link</th>
+        </tr></thead>
+        <tbody>{rows}
+        </tbody>
+      </table>
+    </div></div>
     """
 
-    return html
+    return admin_page("Relatório de Reuniões", inner)
 
 
 @app.route("/chat", methods=["POST"])
@@ -1168,6 +1195,10 @@ def chat_api():
         print("ERRO CHAT:", e)
         return jsonify({"resposta": "Erro no servidor de IA."})
 
+# nome do participante associado a cada socket (sid)
+nomes_por_sid = {}
+
+
 @socketio.on("join")
 def on_join(data):
     room = data.get("room")
@@ -1177,6 +1208,9 @@ def on_join(data):
         return
 
     join_room(room)
+
+    # guarda o nome deste participante
+    nomes_por_sid[request.sid] = nome
 
     emit("user_joined", {
         "id": request.sid,
@@ -1188,8 +1222,15 @@ def on_join(data):
     except Exception:
         users = []
 
+    # envia a lista de participantes já com os nomes
+    usuarios_info = [
+        {"id": uid, "nome": nomes_por_sid.get(uid, "Usuário")}
+        for uid in users
+    ]
+
     emit("all_users", {
-        "users": users
+        "users": users,
+        "usuarios": usuarios_info
     }, to=request.sid)
 
 
@@ -1234,6 +1275,8 @@ def handle_disconnect():
     for room in rooms:
         if room != request.sid:
             emit("user-disconnected", request.sid, room=room)
+
+    nomes_por_sid.pop(request.sid, None)
 
 
 if __name__ == "__main__":

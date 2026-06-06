@@ -21,9 +21,12 @@ body {
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  padding: 0;
+  margin: 0;
   overflow: hidden;
   position: relative;
 }
@@ -79,7 +82,8 @@ canvas {
 }
 
 .branding .logo img {
-  width: 145px;
+  width: 300px;
+  max-width: 80vw;
   height: auto;
   display: block;
 }
@@ -246,9 +250,8 @@ p {
 <div class="container">
   <div class="branding">
     <div class="logo">
-      <img src="/img/logo.svg" alt="Nexy logo">
+      <img src="/img/nexy-logo.svg" alt="Nexy">
     </div>
-    <div class="brand-name">Nexy</div>
   </div>
 
   <div class="card">
